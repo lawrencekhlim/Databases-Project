@@ -1,6 +1,6 @@
 CREATE TABLE Account ( 	account_id		INTEGER,
 				    	deletedDate		DATE,
-				    	moneyVal		DOUBLE NOT NULL,
+				    	moneyVal		FLOAT NOT NULL,
 				   	    primOwner		INTEGER NOT NULL,
 				   	    annualRate 		FLOAT,
 				    	PRIMARY KEY (account_id) 
