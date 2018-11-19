@@ -6,6 +6,7 @@ CREATE TABLE Customer ( TID			INTEGER,
 
 CREATE TABLE Account (  account_id          INTEGER,
                         deletedDate         DATE,
+                        account_type        INTEGER,
                         moneyVal            FLOAT NOT NULL  CHECK (moneyVal >= 0),
                         primOwner           INTEGER NOT NULL,
                         annualRate          FLOAT           CHECK (annualRate >= 0),
