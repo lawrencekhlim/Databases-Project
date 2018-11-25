@@ -12,11 +12,12 @@ public class DatabaseHelper {
   
    private static DatabaseHelper databaseHelper;
    
-   public static void initialize() { 
-      databaseHelper = new DatabaseHelper (); 
-   }
-
+    
+   // Singleton Design Pattern.
    public static DatabaseHelper getInstance () {
+       if (databaseHelper == null) {
+           databaseHelper = new databaseHelper();
+       }
       return databaseHelper;
    }
 
@@ -94,8 +95,8 @@ public class DatabaseHelper {
          System.out.println("Creating statement...");
          stmt = conn.createStatement();
 
-         String sql = "SELECT cid, cname, city, discount FROM cs174.Customers";
-         rs = stmt.executeQuery(sql);
+         //String sql = "SELECT cid, cname, city, discount FROM cs174.Customers";
+         rs = stmt.executeQuery(query);
          //STEP 5: Extract data from result set
          rs.close();
       }catch(SQLException se){
