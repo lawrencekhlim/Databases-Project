@@ -22,7 +22,7 @@ public class Account {
 	public Account(int actID){
 		DatabaseHelper.getInstance().openConnection();
         String query = "SELECT * FROM Account A WHERE A.account_id="+actID;
-      
+      	accountID = actID;
 		ResultSet rs = DatabaseHelper.getInstance().executeQuery(query);
 		try {
             if (rs.next()) {
@@ -95,8 +95,40 @@ public class Account {
 		return accountID;
 	}
 
-	public void setAccountType(int accountID){
-		 
+
+	public void setMoney(double m){
+		  DatabaseHelper.getInstance().openConnection();
+          String updateQuery = "UPDATE Account SET moneyVal=? WHERE account_id=?";
+          PreparedStatement stmt = DatabaseHelper.getInstance ().createAction (updateQuery);
+          System.out.println("money udate: "+m);
+          this.money = m;
+          try {
+                stmt.setDouble(1, m);
+                stmt.setInt(2, accountID);
+                stmt.execute();
+          } catch (Exception e) {
+                e.printStackTrace();
+             
+           }
+           DatabaseHelper.getInstance().closeConnection();
+
+	}
+
+	public void setDeleteDate(java.sql.Date d){
+		  DatabaseHelper.getInstance().openConnection();
+          String updateQuery = "UPDATE Account SET deletedDate=? WHERE account_id=?";
+          PreparedStatement stmt = DatabaseHelper.getInstance ().createAction (updateQuery);
+          System.out.println("Date udate: "+d);
+          this.deleteDate = d;
+          try {
+                stmt.setDate(1, d);
+                stmt.setInt(2, accountID);
+                stmt.execute();
+          } catch (Exception e) {
+                e.printStackTrace();
+             
+           }
+           DatabaseHelper.getInstance().closeConnection();
 
 	}
 
@@ -123,12 +155,20 @@ public class Account {
         // Customer c2 = new Customer (testSubjectA);
         // System.out.println (c2.getName());
         try{
-        	java.text.DateFormat df = new java.text.SimpleDateFormat("MM-dd-yyyy");
+        java.text.DateFormat df = new java.text.SimpleDateFormat("MM-dd-yyyy");
 		java.sql.Date date = new java.sql.Date(df.parse("02-04-2015").getTime());
         Account a  = new Account(0, 100.0,date, 1.1, 0);
         int testA =  a.getAccountID();
         Account test2 = new Account(testA);
         System.out.println(test2.getMoney());
+        test2.setMoney(150.0);
+         date = new java.sql.Date(df.parse("03-04-2015").getTime());
+
+        test2.setDeleteDate(date);
+        Account test3 = new Account(test2.getAccountID());
+        System.out.println(test3.getMoney());
+
+      
 
         } catch(Exception e) {
         	System.out.println("Something went wrong with teh date");
