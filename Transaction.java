@@ -1,6 +1,18 @@
 
 import java.sql.*;
 import java.util.ArrayList;
+//transaction types
+//0 - deposit
+//1 - top up
+//2 - withdrawal
+//3 -  purchase
+//4 - transfer
+//5 - collect
+//6 - pay friend
+//7 - wire
+//8 - write-check
+//9 - accrue interest
+//10 - fees
 
 public class Transaction {
     private int transaction_id;

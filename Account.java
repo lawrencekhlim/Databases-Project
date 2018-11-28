@@ -1,6 +1,11 @@
 //import java.sql.Date;
 import java.sql.*;
-import java.util.Date;
+import java.util
+//checking mums
+//0 - interest checking
+//1 -  student checking
+//2 - savings 
+//3 - pocket 
 
 public class Account {
 	private int accountID;
@@ -95,12 +100,26 @@ public class Account {
 		return accountID;
 	}
 
+	public int getAccountType(){
+		return accountType;
+	}
+
+
+	public double getMoney(){
+		return money;
+	}
+
+
+	public Date getDeleteDate(){
+		return deleteDate;
+	}
+
+
 
 	public void setMoney(double m){
 		  DatabaseHelper.getInstance().openConnection();
           String updateQuery = "UPDATE Account SET moneyVal=? WHERE account_id=?";
           PreparedStatement stmt = DatabaseHelper.getInstance ().createAction (updateQuery);
-          System.out.println("money udate: "+m);
           this.money = m;
           try {
                 stmt.setDouble(1, m);
@@ -118,7 +137,6 @@ public class Account {
 		  DatabaseHelper.getInstance().openConnection();
           String updateQuery = "UPDATE Account SET deletedDate=? WHERE account_id=?";
           PreparedStatement stmt = DatabaseHelper.getInstance ().createAction (updateQuery);
-          System.out.println("Date udate: "+d);
           this.deleteDate = d;
           try {
                 stmt.setDate(1, d);
@@ -132,21 +150,42 @@ public class Account {
 
 	}
 
+	public void setAnnualRate(double annRate){
+		  DatabaseHelper.getInstance().openConnection();
+          String updateQuery = "UPDATE Account SET annualRate=? WHERE account_id=?";
+          PreparedStatement stmt = DatabaseHelper.getInstance ().createAction (updateQuery);
+          this.annualRate = annRate;
+          try {
+                stmt.setDouble(1, annRate);
+                stmt.setInt(2, accountID);
+                stmt.execute();
+          } catch (Exception e) {
+                e.printStackTrace();
+             
+           }
+           DatabaseHelper.getInstance().closeConnection();
 
-	public int getAccountType(){
-		return accountType;
+	}
+
+	public void setPrimaryOwner(int ownID){
+		  DatabaseHelper.getInstance().openConnection();
+          String updateQuery = "UPDATE Account SET primOwner=? WHERE account_id=?";
+          PreparedStatement stmt = DatabaseHelper.getInstance ().createAction (updateQuery);
+          this.primaryOwner = ownID;
+          try {
+                stmt.setInt(1, primaryOwner);
+                stmt.setInt(2, accountID);
+                stmt.execute();
+          } catch (Exception e) {
+                e.printStackTrace();
+             
+           }
+           DatabaseHelper.getInstance().closeConnection();
+
 	}
 
 
-	public double getMoney(){
-		return money;
-	}
-
-
-	public Date getDeleteDate(){
-		return deleteDate;
-	}
-
+	
 
 
 	public static void main (String [] args) {
@@ -157,7 +196,7 @@ public class Account {
         try{
         java.text.DateFormat df = new java.text.SimpleDateFormat("MM-dd-yyyy");
 		java.sql.Date date = new java.sql.Date(df.parse("02-04-2015").getTime());
-        Account a  = new Account(0, 100.0,date, 1.1, 0);
+        Account a  = new Account(0, 100.0,null, 1.1, 0);
         int testA =  a.getAccountID();
         Account test2 = new Account(testA);
         System.out.println(test2.getMoney());
