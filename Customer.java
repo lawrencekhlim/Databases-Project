@@ -1,5 +1,6 @@
 import java.util.Date;
 import java.sql.*;
+import java.util.ArrayList;
 
 public class Customer {
     private int TID;
@@ -17,11 +18,8 @@ public class Customer {
     public Customer(int TID){
         DatabaseHelper.getInstance().openConnection();
         String query = "SELECT * FROM Customer C WHERE C.TID="+TID;
-        System.out.println (query);
-        
         
         ResultSet rs = DatabaseHelper.getInstance().executeQuery(query);
-        //System.out.println ("Here");
         try {
             if (rs.next()) {
                 name = rs.getString("name");
@@ -38,6 +36,15 @@ public class Customer {
     }
     
     public Customer(String name, String address, int PIN){
+        this.name = name;
+        this.address = address;
+        this.PIN = PIN;
+        createID();
+        createCustomer();
+    }
+    
+    public Customer(int TID, String name, String address, int PIN){
+        this.TID = TID;
         this.name = name;
         this.address = address;
         this.PIN = PIN;
@@ -60,9 +67,8 @@ public class Customer {
     
     
     public void createCustomer () {
-        createID();
+        //createID();
         String query = "INSERT INTO Customer (TID, name, address, PIN) VALUES (?, ?, ?, ?)";
-        System.out.println (query);
         DatabaseHelper.getInstance().openConnection();
         PreparedStatement stmt = DatabaseHelper.getInstance ().createAction (query);
         
@@ -71,17 +77,47 @@ public class Customer {
             stmt.setString (2, name);
             stmt.setString (3, address);
             stmt.setString (4, PIN+"");
-            System.out.println ("Here!");
             stmt.execute();
-            System.out.println ("Here2!");
         } catch (SQLException e) {
             System.err.println ("Execution failed");
             e.printStackTrace();
         }
-        System.out.println ("After execution");
+
         DatabaseHelper.getInstance().closeConnection();
         
     }
+    
+    public ArrayList <Integer> getAccounts () {
+        String query1 = "SELECT A.account_id FROM Account A WHERE A.primOwner="+TID;
+        String query2 = "SELECT C.account_id FROM CoOwner C WHERE C.TID="+TID;
+        ArrayList<Integer> accounts = new ArrayList <Integer> ();
+        DatabaseHelper.getInstance().openConnection();
+        try {
+            ResultSet rs = DatabaseHelper.getInstance ().executeQuery(query1);
+            while (rs.next()) {
+                int acctID = rs.getInt("account_id");
+                accounts.add (acctID);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        DatabaseHelper.getInstance().closeConnection();
+        
+        DatabaseHelper.getInstance().openConnection();
+        try {
+            ResultSet rs = DatabaseHelper.getInstance ().executeQuery(query2);
+            while (rs.next()) {
+                int acctID = rs.getInt("account_id");
+                accounts.add (acctID);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        DatabaseHelper.getInstance().closeConnection();
+        
+        return accounts;
+    }
+    
     
     public int getID () {
         return TID;
@@ -99,11 +135,42 @@ public class Customer {
         return PIN;
     }
     
+    public boolean verifyPIN (int PINnumber) {
+        return PINnumber == PIN;
+    }
+    
+    public boolean setPIN (int prevPIN, int newPIN) {
+        if (verifyPIN (prevPIN)) {
+            // Update
+            DatabaseHelper.getInstance().openConnection();
+            String updateQuery = "UPDATE Customer SET PIN=? WHERE TID=?";
+            PreparedStatement stmt = DatabaseHelper.getInstance ().createAction (updateQuery);
+            try {
+                stmt.setInt(1, newPIN);
+                stmt.setInt(2, TID);
+                stmt.execute();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+            DatabaseHelper.getInstance().closeConnection();
+            PIN = newPIN;
+            return true;
+        }
+        else // No update
+            return false;
+    }
+    
+    
     public static void main (String [] args) {
-        Customer c = new Customer ("Lawrence Lim", "11813 Trinity Spring Ct", 4001);
+        Customer c = new Customer (4000021, "Lawrence Lim", "11813 Trinity Spring Ct", 1717);
         int testSubjectA = c.getID ();
         Customer c2 = new Customer (testSubjectA);
         System.out.println (c2.getName());
+        System.out.println (c2.getPIN());
+        c2.setPIN (1717, 3001);
+        Customer c3 = new Customer (testSubjectA);
+        System.out.println (c2.getPIN());
     }
     
 }

@@ -32,9 +32,9 @@ public class DatabaseHelper {
                 //STEP 2: Register JDBC driver
                 Class.forName (JDBC_DRIVER);
                 //STEP 3: Open a connection
-                System.out.println("Connecting to a selected database...");
+                //System.out.println("Connecting to a selected database...");
                 conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
-                System.out.println("Connected database successfully...");
+                //System.out.println("Connected database successfully...");
             }
         } catch (Exception e) {
             e.printStackTrace();
