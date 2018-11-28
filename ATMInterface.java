@@ -62,7 +62,7 @@ public class ATMInterface extends JFrame implements ActionListener {
         submitButton.addActionListener (new ActionListener () {
             public void actionPerformed (ActionEvent e) {
                 System.out.println("here");
-                // gridButtons.setVisible(true);
+                gridButtons.setVisible(true);
                 // ((CardLayout)userInterface.getLayout()).show (userInterface, "idleState");
                 String pinID =  userInput.getText();
                 System.out.println(pinID);
