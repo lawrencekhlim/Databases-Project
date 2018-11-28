@@ -15,23 +15,26 @@ public class Customer {
     }
     
     public Customer(int TID){
-        DatabaseHelper db = DatabaseHelper.getInstance();
+        DatabaseHelper.getInstance().openConnection();
         String query = "SELECT * FROM Customer C WHERE C.TID="+TID;
         System.out.println (query);
-        ResultSet rs = db.executeQuery(query);
-        System.out.println ("Here");
+        
+        
+        ResultSet rs = DatabaseHelper.getInstance().executeQuery(query);
+        //System.out.println ("Here");
         try {
-            rs.first();
-            name = rs.getString("name");
-            address = rs.getString("address");
-            PIN = Integer.parseInt(rs.getString("PIN"));
+            if (rs.next()) {
+                name = rs.getString("name");
+                address = rs.getString("address");
+                PIN = Integer.parseInt(rs.getString("PIN"));
+            }
         } catch (SQLException e) {
             name = "";
             address = "";
             PIN = -1;
         }
         this.TID = TID;
-        
+        DatabaseHelper.getInstance().closeConnection();
     }
     
     public Customer(String name, String address, int PIN){
@@ -44,7 +47,7 @@ public class Customer {
     public void createID () {
         try {
             DatabaseHelper.getInstance ().openConnection();
-            ResultSet rs = DatabaseHelper.getInstance ().query("SELECT MAX (C.TID) FROM Customer C");
+            ResultSet rs = DatabaseHelper.getInstance ().executeQuery("SELECT MAX (C.TID) FROM Customer C");
             if (rs.next())
                 TID = rs.getInt(1)+1;
             DatabaseHelper.getInstance ().closeConnection();
@@ -102,9 +105,6 @@ public class Customer {
         Customer c2 = new Customer (testSubjectA);
         System.out.println (c2.getName());
     }
-    
-    
-    
     
 }
 
