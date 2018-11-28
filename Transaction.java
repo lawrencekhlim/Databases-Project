@@ -80,8 +80,18 @@ public class Transaction {
     }
     
     
-    public void createTransaction () {
+    public boolean createTransaction () {
         //createID();
+        if (decrAcctID != -1) {
+            Account decrAccount = new Account (decrAcctID);
+            if(decrAccount.getMoney()<moneyTrans)
+            {
+                System.out.println("NEGATIVE BALANEC");
+                return false;
+            }
+            decrAccount.setMoney (decrAccount.getMoney() - moneyTrans);
+
+        }
         String query = "INSERT INTO Transaction (transaction_id, transDate, moneyTrans, transType, incrAcctID, decrAcctID) VALUES (?, ?, ?, ?, ?, ?)";
         DatabaseHelper.getInstance().openConnection();
         PreparedStatement stmt = DatabaseHelper.getInstance ().createAction (query);
@@ -103,11 +113,9 @@ public class Transaction {
             Account incrAccount = new Account (incrAcctID);
             incrAccount.setMoney (incrAccount.getMoney() + moneyTrans);
         }
-        if (decrAcctID != -1) {
-            Account decrAccount = new Account (decrAcctID);
-            decrAccount.setMoney (decrAccount.getMoney() - moneyTrans);
-        }
+        
         DatabaseHelper.getInstance().closeConnection();
+        return true;
         
     }
     
@@ -142,7 +150,7 @@ public class Transaction {
             java.sql.Date date = new java.sql.Date(df.parse("02-04-2015").getTime());
             Account a = new Account(3, 240.0, null, 1.3, 2);
             Account b = new Account(2, 140.0, null, 1.3, 2);
-            Transaction c = new Transaction (date, (float)10.0, 1, a.getAccountID(), b.getAccountID());
+            Transaction c = new Transaction (date, (float)30.0, 1, a.getAccountID(), b.getAccountID());
             Transaction d = new Transaction (c.getTransactionID());
             System.out.println(d.getMoneyTransferred());
             System.out.println (new Account (b.getAccountID()).getMoney());

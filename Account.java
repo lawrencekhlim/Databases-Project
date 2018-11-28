@@ -1,12 +1,11 @@
 //import java.sql.Date;
 import java.sql.*;
-import java.util
+import java.util.Date;
 //checking mums
 //0 - interest checking
 //1 -  student checking
 //2 - savings 
 //3 - pocket 
-
 public class Account {
 	private int accountID;
 	private int accountType;

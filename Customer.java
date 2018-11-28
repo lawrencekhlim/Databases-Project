@@ -85,35 +85,51 @@ public class Customer {
         DatabaseHelper.getInstance().closeConnection();
         
     }
-    
-    public ArrayList <Integer> getAccounts () {
+    public ArrayList<Integer> getAllAccts(){
+        ArrayList<Integer> mainList = getMainAccounts();
+        mainList.addAll(getCoOwnerAcct());
+        return mainList;
+    }
+
+    public ArrayList <Integer> getMainAccounts () {
         String query1 = "SELECT A.account_id FROM Account A WHERE A.primOwner="+TID;
-        String query2 = "SELECT C.account_id FROM CoOwner C WHERE C.TID="+TID;
+        //String query2 = "SELECT C.account_id FROM CoOwner C WHERE C.TID="+TID;
         ArrayList<Integer> accounts = new ArrayList <Integer> ();
         DatabaseHelper.getInstance().openConnection();
+
         try {
             ResultSet rs = DatabaseHelper.getInstance ().executeQuery(query1);
             while (rs.next()) {
                 int acctID = rs.getInt("account_id");
                 accounts.add (acctID);
+                System.out.println("primowerner act id "+acctID);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         DatabaseHelper.getInstance().closeConnection();
         
+        return accounts;
+    }
+
+    public ArrayList<Integer> getCoOwnerAcct(){
+        String query2 = "SELECT C.account_id FROM CoOwner C WHERE C.TID="+TID;
+        ArrayList<Integer> accounts = new ArrayList <Integer> ();
         DatabaseHelper.getInstance().openConnection();
         try {
+            System.out.println("im here");
             ResultSet rs = DatabaseHelper.getInstance ().executeQuery(query2);
+            System.out.println(rs);
             while (rs.next()) {
+                  System.out.println("enter me");
                 int acctID = rs.getInt("account_id");
                 accounts.add (acctID);
+                  System.out.println("CoOwner acct id "+acctID);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         DatabaseHelper.getInstance().closeConnection();
-        
         return accounts;
     }
     
@@ -162,14 +178,18 @@ public class Customer {
     
     
     public static void main (String [] args) {
-        Customer c = new Customer (4000021, "Lawrence Lim", "11813 Trinity Spring Ct", 1717);
-        int testSubjectA = c.getID ();
-        Customer c2 = new Customer (testSubjectA);
-        System.out.println (c2.getName());
-        System.out.println (c2.getPIN());
-        c2.setPIN (1717, 3001);
-        Customer c3 = new Customer (testSubjectA);
-        System.out.println (c2.getPIN());
+       // Customer c = new Customer (4000021, "Lawrence Lim", "11813 Trinity Spring Ct", 1717);
+        // Customer c = new Customer (4000021, "Lawrence Lim", "11813 Trinity Spring Ct", 1717);
+        // int testSubjectA = c.getID ();
+        // Customer c2 = new Customer (testSubjectA);
+        // System.out.println (c2.getName());
+        // System.out.println (c2.getPIN());
+        // c2.setPIN (1717, 3001);
+        // Customer c3 = new Customer (testSubjectA);
+        // System.out.println (c2.getPIN());
+
+        Customer ctest =  new Customer(2);
+        System.out.println(ctest.getAllAccts().size());
     }
     
 }
