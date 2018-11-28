@@ -43,10 +43,13 @@ public class Customer {
     
     public void createID () {
         try {
-            ResultSet rs = DatabaseHelper.getInstance ().executeQuery("SELECT MAX (C.TID) FROM Customer C");
-            rs.first();
-            TID = rs.getInt(0)+1;
+            DatabaseHelper.getInstance ().openConnection();
+            ResultSet rs = DatabaseHelper.getInstance ().query("SELECT MAX (C.TID) FROM Customer C");
+            if (rs.next())
+                TID = rs.getInt(1)+1;
+            DatabaseHelper.getInstance ().closeConnection();
         } catch (SQLException e) {
+            e.printStackTrace();
             TID = 0;
         }
         System.out.println (TID);

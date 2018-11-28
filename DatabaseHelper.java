@@ -14,6 +14,7 @@ public class DatabaseHelper {
     private Connection conn = null;
     
     
+    
     // Singleton Design Pattern.
     public static DatabaseHelper getInstance () {
         if (databaseHelper == null) {
@@ -50,35 +51,21 @@ public class DatabaseHelper {
         }
         conn = null;
     }
- 
+    
     public ResultSet executeQuery (String query) {
-        ResultSet rs = null;
-        openConnection();
         Statement stmt = null;
-        try{
-            //STEP 4: Execute a query
-            //System.out.println("Creating statement...");
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery(query);
-            //STEP 5: Extract data from result set
-            rs.close();
-        }catch(SQLException se){
-         //Handle errors for JDBC
-         se.printStackTrace();
-        }catch(Exception e){
-         //Handle errors for Class.forName
-          e.printStackTrace();
-        }finally{
-         //finally block used to close resources
-            try{
-                if(stmt!=null)
-                    conn.close();
-            }catch(SQLException se){
-            }// do nothing
-            closeConnection();
-        }//end try
-        return rs;
+        ResultSet ret = null;
+        if (conn != null) {
+            try {
+                stmt = conn.createStatement();
+                ret = stmt.executeQuery (query);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return ret;
     }
+ 
     
     public PreparedStatement createAction (String query) {
         PreparedStatement ret = null;
@@ -92,48 +79,4 @@ public class DatabaseHelper {
         return ret;
     }
     
-    /*
-    public void executeAction (String query) {
-        ResultSet rs = null;
-        Connection conn = null;
-        PreparedStatement stmt = null;
-        try{
-            //STEP 2: Register JDBC driver
-            Class.forName(JDBC_DRIVER);
-            
-            //STEP 3: Open a connection
-            //System.out.println("Connecting to a selected database...");
-            conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
-            //System.out.println("Connected database successfully...");
-            
-            //STEP 4: Execute a query
-            System.out.println("Creating statement...");
-            stmt = conn.prepareStatement(query);
-            System.out.println("Executing statement...");
-            stmt.execute();
-            System.out.println("End Executing statement...");
-        }catch(SQLException se){
-            //Handle errors for JDBC
-            se.printStackTrace();
-        }catch(Exception e){
-            //Handle errors for Class.forName
-            e.printStackTrace();
-        }finally{
-            //finally block used to close resources
-            try{
-                if(stmt!=null)
-                    conn.close();
-            }catch(SQLException se){
-            }// do nothing
-            try{
-                if(conn!=null)
-                    conn.close();
-            }catch(SQLException se){
-                se.printStackTrace();
-            }//end finally try
-        }//end try
-        //return stmt;
-    }
-
-    */
 }//end DatabaseHelper
