@@ -5,6 +5,7 @@ compile:
 	javac -cp ".:ojdbc6.jar" -d . ATMInterface.java
 	javac -cp ".:ojdbc6.jar" -d . BankTellerInterface.java
 	javac -cp ".:ojdbc6.jar" -d . Account.java
+	javac -cp ".:ojdbc6.jar" -d . Transaction.java
 
 runExample:	
 	java -cp ".:ojdbc6.jar" JDBCExample
@@ -14,6 +15,9 @@ runCustomerTest:
 
 runAccountTest:
 	java -cp ".:ojdbc6.jar" Account
+
+runTransactionTest:
+	java -cp ".:ojdbc6.jar" Transaction
 
 run:	
 	java -cp ".:ojdbc6.jar" ATMInterface
