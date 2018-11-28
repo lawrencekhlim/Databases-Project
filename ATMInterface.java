@@ -1,6 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.Date;
 //transaction types
 //0 - deposit
 //1 - top up
@@ -29,6 +31,7 @@ public class ATMInterface extends JFrame implements ActionListener {
     JButton collectButton;
     JButton wireButton;
     JButton payButton;
+    Customer loggedCust = null;
     
     int actionStatus = 0;
     
@@ -47,21 +50,47 @@ public class ATMInterface extends JFrame implements ActionListener {
         screen.setOpaque(false);
         screen.setBackground(Color.WHITE);
         screen.setSize(150,150);
+
+        JLabel instruction  = new JLabel();
+        JTextField userInput  = new JTextField();
+        userInput.setPreferredSize(new Dimension(150,25));
+        instruction.setText("Enter Pin: ");
+
         
         JButton submitButton = new JButton();
         submitButton.setText("Submit");
         submitButton.addActionListener (new ActionListener () {
             public void actionPerformed (ActionEvent e) {
-                gridButtons.setVisible(true);
-                ((CardLayout)userInterface.getLayout()).show (userInterface, "idleState");
+                System.out.println("here");
+                // gridButtons.setVisible(true);
+                // ((CardLayout)userInterface.getLayout()).show (userInterface, "idleState");
+                String pinID =  userInput.getText();
+                System.out.println(pinID);
+                ArrayList<String> allPins = new ArrayList<>();
+                allPins = Customer.getAllPins();
+
+                for(int i =0; i<allPins.size(); i++)
+                {
+                    if(allPins.get(i).equals(pinID))
+                    {
+                        System.out.println("We have a mach!");
+                        loggedCust = new Customer(pinID);
+                        System.out.print(loggedCust.getName());
+                        gridButtons.setVisible(true);
+                        ((CardLayout)userInterface.getLayout()).show (userInterface, "idleState");
+                    }
+                }
+
+                if(loggedCust==null)
+                {
+                    JOptionPane.showMessageDialog(null, "ERROR! Pin is not linked to an account.");
+
+                }
                 actionStatus = 1;
             }
         });
         
-        JLabel instruction  = new JLabel();
-        JTextField userInput  = new JTextField();
-        userInput.setPreferredSize(new Dimension(150,25));
-        instruction.setText("Enter Pin: ");
+      
         
         screen.add(instruction);
         screen.add(userInput);
@@ -148,21 +177,26 @@ public class ATMInterface extends JFrame implements ActionListener {
         // End singleAccountTrans
         
         
-        // Beginning twoAccountTrans
+        // Beginning twoAccountTrans-------------------------------------------------------------------------
         
         twoAccountTrans = new JPanel ();
         JLabel accounts3 = new JLabel();
         accounts3.setText ("Accounts");
         JComboBox comboBox3 = new JComboBox();
-        comboBox3.setMinimumSize (new Dimension (100, 30));
+        comboBox3.setMinimumSize (new Dimension (200, 30));
         JButton cancelButton3 = new JButton ();
         JLabel dollars3 = new JLabel ();
         dollars3.setText ("$");
         JTextField moneyChanged3 = new JTextField ();
         moneyChanged3.setPreferredSize(new Dimension(150,25));
+
+
+        JComboBox sendToDropDown = new JComboBox();
+        sendToDropDown.setMinimumSize (new Dimension (200, 30));
         
         JLabel sendTo3 = new JLabel ();
         sendTo3.setText ("Send To");
+
         JTextField sendToField3 = new JTextField ();
         sendToField3.setPreferredSize(new Dimension(150,25));
         
@@ -179,11 +213,84 @@ public class ATMInterface extends JFrame implements ActionListener {
                 collectButton.setVisible (true);
                 wireButton.setVisible (true);
                 payButton.setVisible (true);
+
             }
         });
         
         JButton confirmButton3 = new JButton ();
         confirmButton3.setText ("Confirm");
+        confirmButton3.addActionListener(new ActionListener () {
+            public void actionPerformed (ActionEvent e) {
+                ((CardLayout)userInterface.getLayout()).show (userInterface, "idleState");
+                if(actionStatus==3)
+                {
+                    //top up: move money from linked checking/saving into pocket acct
+                    String fromAcct = comboBox3.getSelectedItem().toString();
+                    String toAcct = sendToDropDown.getSelectedItem().toString();
+                    String m = moneyChanged3.getText();
+                   
+                    java.sql.Date date = new java.sql.Date( java.lang.System.currentTimeMillis());
+
+                    if(fromAcct==null || m==null || toAcct==null)
+                    {
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
+                        return;
+                    }
+
+                    Transaction t = new Transaction(date,Float.parseFloat(m), 1,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
+
+
+                }
+                else if(actionStatus==6)
+                {
+                    //transfer: move money from checking/savings to another checking/savings
+                    //must have atleast one owner in common, cannot exced over 2000 dollars
+
+                    //TODO: just a ? doesn't every bank transaction have to have an owner in common?? or are we transferring from my checking
+                    //to someone elses checking... how is this diff from pay friend then? and how is it allowed?
+                    String fromAcct = comboBox3.getSelectedItem().toString();
+                    String toAcct = sendToDropDown.getSelectedItem().toString();
+                    String m = moneyChanged3.getText();
+                   
+                    java.sql.Date date = new java.sql.Date( java.lang.System.currentTimeMillis());
+
+                    if(fromAcct==null || m==null || toAcct==null)
+                    {
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
+                        return;
+                    } else if (Float.parseFloat(m)>2000){
+                        JOptionPane.showMessageDialog(null, "ERROR! Money transferred cannot be above $2000.");
+                    }
+
+                    Transaction t = new Transaction(date,Float.parseFloat(m), 4,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
+
+                }
+                else if(actionStatus==7)
+                {
+                    //collect: Move money from the pocket account back to the linked checking/savings account, 
+                    //there will be a 3% fee assessed.
+
+
+                }
+                else if(actionStatus==8)
+                {
+                    //wire: move $ from savings or checking account and add it to another.
+                    //customer must be owner + 2% fee
+
+
+                }
+                else if(actionStatus==9)
+                {
+                    //payfriend: move from one pocket acct to another pocket acct
+
+
+                }
+                else
+                {
+
+                }
+            }
+        });
         
         twoAccountTrans.add (cancelButton3);
         twoAccountTrans.add (accounts3);
@@ -192,10 +299,11 @@ public class ATMInterface extends JFrame implements ActionListener {
         twoAccountTrans.add (moneyChanged3);
         twoAccountTrans.add (sendTo3);
         twoAccountTrans.add (sendToField3);
+        twoAccountTrans.add (sendToDropDown);
         twoAccountTrans.add (confirmButton3);
         twoAccountTrans.setVisible (true);
         
-        // End twoAccountTrans
+        // End twoAccountTrans-----------------------------------------------------------------------------------------
         
         
         // Beginning CardLayout
@@ -235,6 +343,8 @@ public class ATMInterface extends JFrame implements ActionListener {
         });
         gridButtons.add(depositButton);
 
+
+        //TOPUP: move money from linked checking/saving into pocket acct
         topUpButton = new JButton();
         topUpButton.setText("Top Up");
         gridButtons.add(topUpButton);
@@ -242,6 +352,7 @@ public class ATMInterface extends JFrame implements ActionListener {
             public void actionPerformed (ActionEvent e) {
                 ((CardLayout)userInterface.getLayout()).show (userInterface, "twoAccountTrans");
                 actionStatus = 3;
+                sendToField3.setVisible(false);
                 depositButton.setVisible (false);
                 withdrawlButton.setVisible (false);
                 purchaseButton.setVisible (false);
@@ -249,6 +360,24 @@ public class ATMInterface extends JFrame implements ActionListener {
                 collectButton.setVisible (false);
                 wireButton.setVisible (false);
                 payButton.setVisible (false);
+
+                //TODO: so nothing works right now, but whenever we get all the account stuff to work,
+                // we need to write better queries for differentiating between types for coOwner stuff
+                //as well
+                //POPULATION IN THE NATION
+                ArrayList<Integer> allCheckingSavingAccts  = new ArrayList<>();
+                allCheckingSavingAccts.addAll(loggedCust.getSavingsAccounts());
+                allCheckingSavingAccts.addAll(loggedCust.getCheckingAccounts());
+                comboBox3.setModel(new DefaultComboBoxModel(allCheckingSavingAccts.toArray()));
+
+                 ArrayList<Integer> pocketAccts  = new ArrayList<>();
+                 pocketAccts.addAll(loggedCust.getPocketAccounts());
+                 //TODO: fix!!!!!!!!! we need pocket accounts to workkkk
+                 sendToDropDown.setModel(new DefaultComboBoxModel(allCheckingSavingAccts.toArray()));
+
+
+
+
             }
         });
 
@@ -293,6 +422,7 @@ public class ATMInterface extends JFrame implements ActionListener {
             public void actionPerformed (ActionEvent e) {
                 ((CardLayout)userInterface.getLayout()).show (userInterface, "twoAccountTrans");
                 actionStatus = 6;
+                sendToField3.setVisible(false);
                 depositButton.setVisible (false);
                 topUpButton.setVisible (false);
                 withdrawlButton.setVisible (false);
@@ -300,6 +430,14 @@ public class ATMInterface extends JFrame implements ActionListener {
                 collectButton.setVisible (false);
                 wireButton.setVisible (false);
                 payButton.setVisible (false);
+
+
+                ArrayList<Integer> allCheckingSavingAccts  = new ArrayList<>();
+                allCheckingSavingAccts.addAll(loggedCust.getSavingsAccounts());
+                allCheckingSavingAccts.addAll(loggedCust.getCheckingAccounts());
+                comboBox3.setModel(new DefaultComboBoxModel(allCheckingSavingAccts.toArray()));
+
+                sendToDropDown.setModel(new DefaultComboBoxModel(allCheckingSavingAccts.toArray()));
             }
         });
 
@@ -310,6 +448,7 @@ public class ATMInterface extends JFrame implements ActionListener {
             public void actionPerformed (ActionEvent e) {
                 ((CardLayout)userInterface.getLayout()).show (userInterface, "twoAccountTrans");
                 actionStatus = 7;
+                sendToField3.setVisible(false);
                 depositButton.setVisible (false);
                 topUpButton.setVisible (false);
                 withdrawlButton.setVisible (false);
@@ -327,7 +466,8 @@ public class ATMInterface extends JFrame implements ActionListener {
         wireButton.addActionListener (new ActionListener () {
             public void actionPerformed (ActionEvent e) {
                 ((CardLayout)userInterface.getLayout()).show (userInterface, "twoAccountTrans");
-                actionStatus = 7;
+                actionStatus = 8;
+                sendToField3.setVisible(false);
                 depositButton.setVisible (false);
                 topUpButton.setVisible (false);
                 withdrawlButton.setVisible (false);
@@ -345,7 +485,8 @@ public class ATMInterface extends JFrame implements ActionListener {
         payButton.addActionListener (new ActionListener () {
             public void actionPerformed (ActionEvent e) {
                 ((CardLayout)userInterface.getLayout()).show (userInterface, "twoAccountTrans");
-                actionStatus = 8;
+                actionStatus = 9;
+                sendToDropDown.setVisible(false);
                 depositButton.setVisible (false);
                 topUpButton.setVisible (false);
                 withdrawlButton.setVisible (false);
@@ -377,10 +518,10 @@ public class ATMInterface extends JFrame implements ActionListener {
     
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
-    public void actionPerformed(ActionEvent e){
-        System.out.println("Oui!");
-    }
     
+    public void actionPerformed(ActionEvent e){
+        System.out.println("Oui!");}
+
     public static void main(String[] args) {
         ATMInterface ex = new ATMInterface();
         ex.setVisible(true);
