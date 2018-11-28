@@ -1,7 +1,7 @@
 CREATE TABLE Customer ( TID			INTEGER,
 				    	name		CHAR(30),
 				    	address		CHAR(40),
-				   	    PIN			CHAR(4) NOT NULL UNIQUE,
+				   	    PIN			CHAR(4) NOT NULL,
 				    	PRIMARY KEY (TID));
 
 CREATE TABLE Account (  account_id          INTEGER,
