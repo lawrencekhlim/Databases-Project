@@ -18,7 +18,19 @@ public class ATMInterface extends JFrame implements ActionListener {
     JPanel gridButtons;
     JPanel userInterface;
     JPanel idlePanel;
-    JPanel deposit;
+    JPanel singleAccountTrans;
+    JPanel twoAccountTrans;
+    
+    JButton depositButton;
+    JButton topUpButton;
+    JButton withdrawlButton;
+    JButton purchaseButton;
+    JButton transferButton;
+    JButton collectButton;
+    JButton wireButton;
+    JButton payButton;
+    
+    int actionStatus = 0;
     
     public ATMInterface() {
         initUI();
@@ -42,6 +54,7 @@ public class ATMInterface extends JFrame implements ActionListener {
             public void actionPerformed (ActionEvent e) {
                 gridButtons.setVisible(true);
                 ((CardLayout)userInterface.getLayout()).show (userInterface, "idleState");
+                actionStatus = 1;
             }
         });
         
@@ -67,6 +80,15 @@ public class ATMInterface extends JFrame implements ActionListener {
             public void actionPerformed (ActionEvent e) {
                 gridButtons.setVisible(false);
                 ((CardLayout)userInterface.getLayout()).show (userInterface, "login");
+                actionStatus = 0;
+                depositButton.setVisible (true);
+                topUpButton.setVisible (true);
+                withdrawlButton.setVisible (true);
+                purchaseButton.setVisible (true);
+                transferButton.setVisible (true);
+                collectButton.setVisible (true);
+                wireButton.setVisible (true);
+                payButton.setVisible (true);
             }
         });
         
@@ -83,9 +105,9 @@ public class ATMInterface extends JFrame implements ActionListener {
         // End idle panel
         
         
-        // Beginning Deposit
+        // Beginning singleAccountTrans
         
-        deposit = new JPanel ();
+        singleAccountTrans = new JPanel ();
         JLabel accounts2 = new JLabel();
         accounts2.setText ("Accounts");
         JComboBox comboBox2 = new JComboBox();
@@ -100,26 +122,80 @@ public class ATMInterface extends JFrame implements ActionListener {
         cancelButton2.addActionListener (new ActionListener () {
             public void actionPerformed (ActionEvent e) {
                 ((CardLayout)userInterface.getLayout()).show (userInterface, "idleState");
+                actionStatus = 1;
+                depositButton.setVisible (true);
+                topUpButton.setVisible (true);
+                withdrawlButton.setVisible (true);
+                purchaseButton.setVisible (true);
+                transferButton.setVisible (true);
+                collectButton.setVisible (true);
+                wireButton.setVisible (true);
+                payButton.setVisible (true);
             }
         });
         
         JButton confirmButton2 = new JButton ();
         confirmButton2.setText ("Confirm");
         
-        deposit.add (cancelButton2);
-        deposit.add (accounts2);
-        deposit.add (comboBox2);
-        deposit.add (dollars2);
-        deposit.add (moneyChanged2);
-        deposit.add (confirmButton2);
-        deposit.setVisible (true);
+        singleAccountTrans.add (cancelButton2);
+        singleAccountTrans.add (accounts2);
+        singleAccountTrans.add (comboBox2);
+        singleAccountTrans.add (dollars2);
+        singleAccountTrans.add (moneyChanged2);
+        singleAccountTrans.add (confirmButton2);
+        singleAccountTrans.setVisible (true);
         
-        // End Deposit
-        
-        //
+        // End singleAccountTrans
         
         
-        //
+        // Beginning twoAccountTrans
+        
+        twoAccountTrans = new JPanel ();
+        JLabel accounts3 = new JLabel();
+        accounts3.setText ("Accounts");
+        JComboBox comboBox3 = new JComboBox();
+        comboBox3.setMinimumSize (new Dimension (100, 30));
+        JButton cancelButton3 = new JButton ();
+        JLabel dollars3 = new JLabel ();
+        dollars3.setText ("$");
+        JTextField moneyChanged3 = new JTextField ();
+        moneyChanged3.setPreferredSize(new Dimension(150,25));
+        
+        JLabel sendTo3 = new JLabel ();
+        sendTo3.setText ("Send To");
+        JTextField sendToField3 = new JTextField ();
+        sendToField3.setPreferredSize(new Dimension(150,25));
+        
+        cancelButton3.setText ("Cancel");
+        cancelButton3.addActionListener (new ActionListener () {
+            public void actionPerformed (ActionEvent e) {
+                ((CardLayout)userInterface.getLayout()).show (userInterface, "idleState");
+                actionStatus = 1;
+                depositButton.setVisible (true);
+                topUpButton.setVisible (true);
+                withdrawlButton.setVisible (true);
+                purchaseButton.setVisible (true);
+                transferButton.setVisible (true);
+                collectButton.setVisible (true);
+                wireButton.setVisible (true);
+                payButton.setVisible (true);
+            }
+        });
+        
+        JButton confirmButton3 = new JButton ();
+        confirmButton3.setText ("Confirm");
+        
+        twoAccountTrans.add (cancelButton3);
+        twoAccountTrans.add (accounts3);
+        twoAccountTrans.add (comboBox3);
+        twoAccountTrans.add (dollars3);
+        twoAccountTrans.add (moneyChanged3);
+        twoAccountTrans.add (sendTo3);
+        twoAccountTrans.add (sendToField3);
+        twoAccountTrans.add (confirmButton3);
+        twoAccountTrans.setVisible (true);
+        
+        // End twoAccountTrans
         
         
         // Beginning CardLayout
@@ -129,7 +205,8 @@ public class ATMInterface extends JFrame implements ActionListener {
         userInterface.setSize (150, 150);
         userInterface.add (screen, "login");
         userInterface.add (idlePanel, "idleState");
-        userInterface.add (deposit, "deposit");
+        userInterface.add (singleAccountTrans, "singleAccountTrans");
+        userInterface.add (twoAccountTrans, "twoAccountTrans");
         
         ((CardLayout)userInterface.getLayout()).show (userInterface, "login");
         // End CardLayout
@@ -141,43 +218,143 @@ public class ATMInterface extends JFrame implements ActionListener {
         gridButtons.setLayout(new GridLayout(4,2));
         gridButtons.setVisible(false);
 
-        JButton depositButton = new JButton();
+        depositButton = new JButton();
         depositButton.setText("Deposit");
         depositButton.addActionListener (new ActionListener () {
             public void actionPerformed (ActionEvent e) {
-                ((CardLayout)userInterface.getLayout()).show (userInterface, "deposit");
+                ((CardLayout)userInterface.getLayout()).show (userInterface, "singleAccountTrans");
+                actionStatus = 2;
+                topUpButton.setVisible (false);
+                withdrawlButton.setVisible (false);
+                purchaseButton.setVisible (false);
+                transferButton.setVisible (false);
+                collectButton.setVisible (false);
+                wireButton.setVisible (false);
+                payButton.setVisible (false);
             }
         });
         gridButtons.add(depositButton);
 
-        JButton topDownButton = new JButton();
-        topDownButton.setText("Top Down");
-        gridButtons.add(topDownButton);
+        topUpButton = new JButton();
+        topUpButton.setText("Top Up");
+        gridButtons.add(topUpButton);
+        topUpButton.addActionListener (new ActionListener () {
+            public void actionPerformed (ActionEvent e) {
+                ((CardLayout)userInterface.getLayout()).show (userInterface, "twoAccountTrans");
+                actionStatus = 3;
+                depositButton.setVisible (false);
+                withdrawlButton.setVisible (false);
+                purchaseButton.setVisible (false);
+                transferButton.setVisible (false);
+                collectButton.setVisible (false);
+                wireButton.setVisible (false);
+                payButton.setVisible (false);
+            }
+        });
 
-        JButton withdrawlButton = new JButton();
-        withdrawlButton.setText("Withdraw");
+        withdrawlButton = new JButton();
+        withdrawlButton.setText("Withdrawal");
         gridButtons.add(withdrawlButton);
+        withdrawlButton.addActionListener (new ActionListener () {
+            public void actionPerformed (ActionEvent e) {
+                ((CardLayout)userInterface.getLayout()).show (userInterface, "singleAccountTrans");
+                actionStatus = 4;
+                depositButton.setVisible (false);
+                topUpButton.setVisible (false);
+                purchaseButton.setVisible (false);
+                transferButton.setVisible (false);
+                collectButton.setVisible (false);
+                wireButton.setVisible (false);
+                payButton.setVisible (false);
+            }
+        });
 
-        JButton purchaseButton = new JButton();
+        purchaseButton = new JButton();
         purchaseButton.setText("Purchase");
         gridButtons.add(purchaseButton);
+        purchaseButton.addActionListener (new ActionListener () {
+            public void actionPerformed (ActionEvent e) {
+                ((CardLayout)userInterface.getLayout()).show (userInterface, "singleAccountTrans");
+                actionStatus = 5;
+                depositButton.setVisible (false);
+                topUpButton.setVisible (false);
+                withdrawlButton.setVisible (false);
+                transferButton.setVisible (false);
+                collectButton.setVisible (false);
+                wireButton.setVisible (false);
+                payButton.setVisible (false);
+            }
+        });
 
-        JButton transferButton = new JButton();
+        transferButton = new JButton();
         transferButton.setText("Transfer");
         gridButtons.add(transferButton);
+        transferButton.addActionListener (new ActionListener () {
+            public void actionPerformed (ActionEvent e) {
+                ((CardLayout)userInterface.getLayout()).show (userInterface, "twoAccountTrans");
+                actionStatus = 6;
+                depositButton.setVisible (false);
+                topUpButton.setVisible (false);
+                withdrawlButton.setVisible (false);
+                purchaseButton.setVisible (false);
+                collectButton.setVisible (false);
+                wireButton.setVisible (false);
+                payButton.setVisible (false);
+            }
+        });
 
-        JButton collectButton = new JButton();
+        collectButton = new JButton();
         collectButton.setText("Collect");
         gridButtons.add(collectButton);
+        collectButton.addActionListener (new ActionListener () {
+            public void actionPerformed (ActionEvent e) {
+                ((CardLayout)userInterface.getLayout()).show (userInterface, "twoAccountTrans");
+                actionStatus = 7;
+                depositButton.setVisible (false);
+                topUpButton.setVisible (false);
+                withdrawlButton.setVisible (false);
+                purchaseButton.setVisible (false);
+                transferButton.setVisible (false);
+                wireButton.setVisible (false);
+                payButton.setVisible (false);
+            }
+        });
+        
 
-        JButton wireButton = new JButton();
+        wireButton = new JButton();
         wireButton.setText("Wire");
         gridButtons.add(wireButton);
+        wireButton.addActionListener (new ActionListener () {
+            public void actionPerformed (ActionEvent e) {
+                ((CardLayout)userInterface.getLayout()).show (userInterface, "twoAccountTrans");
+                actionStatus = 7;
+                depositButton.setVisible (false);
+                topUpButton.setVisible (false);
+                withdrawlButton.setVisible (false);
+                purchaseButton.setVisible (false);
+                transferButton.setVisible (false);
+                collectButton.setVisible (false);
+                payButton.setVisible (false);
+            }
+        });
+        
 
-
-        JButton payButton = new JButton();
+        payButton = new JButton();
         payButton.setText("Pay Friend");
         gridButtons.add(payButton);
+        payButton.addActionListener (new ActionListener () {
+            public void actionPerformed (ActionEvent e) {
+                ((CardLayout)userInterface.getLayout()).show (userInterface, "twoAccountTrans");
+                actionStatus = 8;
+                depositButton.setVisible (false);
+                topUpButton.setVisible (false);
+                withdrawlButton.setVisible (false);
+                purchaseButton.setVisible (false);
+                transferButton.setVisible (false);
+                collectButton.setVisible (false);
+                wireButton.setVisible (false);
+            }
+        });
 
         // End gridButtons
 
