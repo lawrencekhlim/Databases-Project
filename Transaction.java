@@ -93,7 +93,7 @@ public class Transaction {
         }
         if (decrAcctID != -1) {
             Account decrAccount = new Account (decrAcctID);
-            incrAccount.setMoney (decrAccount.getMoney() - moneyTrans);
+            decrAccount.setMoney (decrAccount.getMoney() - moneyTrans);
         }
         DatabaseHelper.getInstance().closeConnection();
         
@@ -107,7 +107,7 @@ public class Transaction {
         return transDate;
     }
     
-    public float getMoneyTransfered () {
+    public float getMoneyTransferred () {
         return moneyTrans;
     }
     
@@ -124,7 +124,20 @@ public class Transaction {
     }
     
     public static void main (String [] args) {
-        Transaction c = new Transaction ();
+        //Transaction c = new Transaction ();
+        try {
+            java.text.DateFormat df = new java.text.SimpleDateFormat("MM-dd-yyyy");
+            java.sql.Date date = new java.sql.Date(df.parse("02-04-2015").getTime());
+            Account a = new Account(3, 240.0, null, 1.3, 2);
+            Account b = new Account(2, 140.0, null, 1.3, 2);
+            Transaction c = new Transaction (date, (float)10.0, 1, a.getAccountID(), b.getAccountID());
+            Transaction d = new Transaction (c.getTransactionID());
+            System.out.println(d.getMoneyTransferred());
+            System.out.println (new Account (b.getAccountID()).getMoney());
+        } catch (Exception e) {
+            System.out.println ("Failed");
+            e.printStackTrace();
+        }
     }
     
 }
