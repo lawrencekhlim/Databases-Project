@@ -43,7 +43,13 @@ public class Transaction {
                 moneyTrans = rs.getFloat("moneyTrans");
                 transType = rs.getInt ("transType");
                 incrAcctID = rs.getInt ("incrAcctID");
+                if (rs.wasNull ()) {
+                    incrAcctID = -1;
+                }
                 decrAcctID = rs.getInt ("decrAcctID");
+                if (rs.wasNull ()) {
+                    decrAcctID = -1;
+                }
             }
         } catch (SQLException e) {
             transDate = null;
@@ -56,6 +62,7 @@ public class Transaction {
     }
     
     public Transaction(Date transDate, float moneyTrans, int transType, int incrAcctID, int decrAcctID){
+        this.transDate = transDate;
         this.moneyTrans = moneyTrans;
         this.transType = transType;
         this.incrAcctID = incrAcctID;
@@ -90,7 +97,9 @@ public class Transaction {
             }
 
         }
+        
         String query = "INSERT INTO Transaction (transaction_id, transDate, moneyTrans, transType, incrAcctID, decrAcctID) VALUES (?, ?, ?, ?, ?, ?)";
+        
         DatabaseHelper.getInstance().openConnection();
         PreparedStatement stmt = DatabaseHelper.getInstance ().createAction (query);
         
@@ -99,8 +108,14 @@ public class Transaction {
             stmt.setDate (2, transDate);
             stmt.setFloat (3, moneyTrans);
             stmt.setInt (4, transType);
-            stmt.setInt (5, incrAcctID);
-            stmt.setInt (6, decrAcctID);
+            if (incrAcctID == -1)
+                stmt.setNull (5, Types.INTEGER);
+            else
+                stmt.setInt (5, incrAcctID);
+            if (decrAcctID == -1)
+                stmt.setNull (6, Types.INTEGER);
+            else
+                stmt.setInt (6, decrAcctID);
             stmt.execute();
         } catch (SQLException e) {
             System.err.println ("Execution failed");
