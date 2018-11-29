@@ -17,8 +17,9 @@ public class Customer {
     
     public Customer(int TID){
         DatabaseHelper.getInstance().openConnection();
+        this.TID = TID;
+
         String query = "SELECT * FROM Customer C WHERE C.TID="+TID;
-        
         ResultSet rs = DatabaseHelper.getInstance().executeQuery(query);
         try {
             if (rs.next()) {
@@ -30,8 +31,8 @@ public class Customer {
             name = "";
             address = "";
             PIN = -1;
+            TID = -1;
         }
-        this.TID = TID;
         DatabaseHelper.getInstance().closeConnection();
     }
     
@@ -59,6 +60,7 @@ public class Customer {
             name = "";
             address = "";
             PIN = -1;
+            TID = -1;
         }
         DatabaseHelper.getInstance().closeConnection();
 

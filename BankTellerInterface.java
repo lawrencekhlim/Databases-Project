@@ -3,7 +3,11 @@ import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
 import java.util.HashMap;
+import java.util.ArrayList;
+
 public class BankTellerInterface extends JFrame {
+    Date current = new java.sql.Date(java.lang.System.currentTimeMillis());
+    
     JPanel gridButtons;
     JPanel userInterface;
     JPanel screen;
@@ -43,7 +47,7 @@ public class BankTellerInterface extends JFrame {
        title.setText("Bank Teller");
        title.setVisible(true);
        
-       //screen -----------------------------------------------------
+        //screen -----------------------------------------------------
         screen = new JPanel();
         screen.setLayout(new FlowLayout());
         screen.setOpaque(false);
@@ -208,14 +212,46 @@ public class BankTellerInterface extends JFrame {
         
         JButton submit4 = new JButton ("Submit");
         submit4.addActionListener ( new ActionListener () {
-            public void actionPerformed (ActionEvent e) {
-                if (customerActionStatus == 0) {
+            public void actionPerformed (ActionEvent ae) {
+                Customer c = null;
+                boolean fail = false;
+                try {
+                    c = new Customer (Integer.parseInt (customerTIDTextField4.getText()));
+                } catch (Exception e) {
+                    fail = true;
+                }
+                
+                fail = fail || c == null || c.getID() == -1;
+                
+                if (!fail && customerActionStatus == 0) {
                     // TODO Generate Monthly Statement
+                    ArrayList <Account> accounts = c.getAccounts ();
+                    String output = "Monthly Statement\n";
                     
+
+                    JOptionPane.showMessageDialog(null, output);
                     
-                } else if (customerActionStatus == 1) {
+                } else if (!fail && customerActionStatus == 1) {
                     // TODO Customer Report
-                    
+                    ArrayList <Account> accounts = c.getAccounts ();
+                    String output = "Monthly Statement\n";
+                    for (Account account: accounts) {
+                        output += "Account ID:  " + account.getAccountID();
+                        output += "  Account Type:  ";
+                        if (account.getAccountType() == 0)
+                            output += "Interest Checking";
+                        else if (account.getAccountType() == 1)
+                            output += "Student Checking";
+                        else if (account.getAccountType() == 2)
+                            output += "Savings";
+                        else
+                            output += "Pocket";
+                        
+                        if (account.getDeleteDate() != null)
+                            output += "  Deleted Date:  " + account.getDeleteDate().toString();
+                        output+= "\n";
+                    }
+                    JOptionPane.showMessageDialog(null, output);
                     
                 }
                 idleView();
@@ -276,9 +312,6 @@ public class BankTellerInterface extends JFrame {
                 ((CardLayout)userInterface.getLayout()).show (userInterface, "customerIDPanel");
                 setGridButtonsVisible (false);
                 genMSButton.setVisible (true);
-                
-                String output = "Monthly Statement\n";
-                JOptionPane.showMessageDialog(null, output);
             }
         });
 
@@ -289,7 +322,6 @@ public class BankTellerInterface extends JFrame {
             public void actionPerformed (ActionEvent ae) {
                 DatabaseHelper.getInstance().openConnection();
                 ResultSet rs = DatabaseHelper.getInstance().executeQuery ("SELECT A.account_id, A.deletedDate FROM Account A");
-                Date current = new java.sql.Date(java.lang.System.currentTimeMillis());
                 long day30 = 31l * 24 * 60 * 60 * 1000;
                 HashMap <Integer, Date> hashMap = new HashMap <> ();
                 try {
@@ -336,8 +368,6 @@ public class BankTellerInterface extends JFrame {
                 ((CardLayout)userInterface.getLayout()).show (userInterface, "customerIDPanel");
                 setGridButtonsVisible (false);
                 customerReportButton.setVisible (true);
-                
-                JOptionPane.showMessageDialog(null, "Customer Report\nA\nB");
             }
         });
 
