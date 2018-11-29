@@ -62,7 +62,7 @@ public class ATMInterface extends JFrame implements ActionListener {
         submitButton.addActionListener (new ActionListener () {
             public void actionPerformed (ActionEvent e) {
                 System.out.println("here");
-                // gridButtons.setVisible(true);
+                gridButtons.setVisible(true);
                 // ((CardLayout)userInterface.getLayout()).show (userInterface, "idleState");
                 String pinID =  userInput.getText();
                 System.out.println(pinID);
@@ -86,7 +86,7 @@ public class ATMInterface extends JFrame implements ActionListener {
                     JOptionPane.showMessageDialog(null, "ERROR! Pin is not linked to an account.");
 
                 }
-                actionStatus = 1;
+                idleView();
             }
         });
         
@@ -150,16 +150,7 @@ public class ATMInterface extends JFrame implements ActionListener {
         cancelButton2.setText ("Cancel");
         cancelButton2.addActionListener (new ActionListener () {
             public void actionPerformed (ActionEvent e) {
-                ((CardLayout)userInterface.getLayout()).show (userInterface, "idleState");
-                actionStatus = 1;
-                depositButton.setVisible (true);
-                topUpButton.setVisible (true);
-                withdrawlButton.setVisible (true);
-                purchaseButton.setVisible (true);
-                transferButton.setVisible (true);
-                collectButton.setVisible (true);
-                wireButton.setVisible (true);
-                payButton.setVisible (true);
+                idleView();
             }
         });
         
@@ -203,16 +194,7 @@ public class ATMInterface extends JFrame implements ActionListener {
         cancelButton3.setText ("Cancel");
         cancelButton3.addActionListener (new ActionListener () {
             public void actionPerformed (ActionEvent e) {
-                ((CardLayout)userInterface.getLayout()).show (userInterface, "idleState");
-                actionStatus = 1;
-                depositButton.setVisible (true);
-                topUpButton.setVisible (true);
-                withdrawlButton.setVisible (true);
-                purchaseButton.setVisible (true);
-                transferButton.setVisible (true);
-                collectButton.setVisible (true);
-                wireButton.setVisible (true);
-                payButton.setVisible (true);
+                idleView ();
 
             }
         });
@@ -332,13 +314,8 @@ public class ATMInterface extends JFrame implements ActionListener {
             public void actionPerformed (ActionEvent e) {
                 ((CardLayout)userInterface.getLayout()).show (userInterface, "singleAccountTrans");
                 actionStatus = 2;
-                topUpButton.setVisible (false);
-                withdrawlButton.setVisible (false);
-                purchaseButton.setVisible (false);
-                transferButton.setVisible (false);
-                collectButton.setVisible (false);
-                wireButton.setVisible (false);
-                payButton.setVisible (false);
+                setGridButtonsVisible (false);
+                depositButton.setVisible (true);
             }
         });
         gridButtons.add(depositButton);
@@ -353,13 +330,8 @@ public class ATMInterface extends JFrame implements ActionListener {
                 ((CardLayout)userInterface.getLayout()).show (userInterface, "twoAccountTrans");
                 actionStatus = 3;
                 sendToField3.setVisible(false);
-                depositButton.setVisible (false);
-                withdrawlButton.setVisible (false);
-                purchaseButton.setVisible (false);
-                transferButton.setVisible (false);
-                collectButton.setVisible (false);
-                wireButton.setVisible (false);
-                payButton.setVisible (false);
+                setGridButtonsVisible (false);
+                topUpButton.setVisible (true);
 
                 //TODO: so nothing works right now, but whenever we get all the account stuff to work,
                 // we need to write better queries for differentiating between types for coOwner stuff
@@ -388,13 +360,8 @@ public class ATMInterface extends JFrame implements ActionListener {
             public void actionPerformed (ActionEvent e) {
                 ((CardLayout)userInterface.getLayout()).show (userInterface, "singleAccountTrans");
                 actionStatus = 4;
-                depositButton.setVisible (false);
-                topUpButton.setVisible (false);
-                purchaseButton.setVisible (false);
-                transferButton.setVisible (false);
-                collectButton.setVisible (false);
-                wireButton.setVisible (false);
-                payButton.setVisible (false);
+                setGridButtonsVisible (false);
+                withdrawlButton.setVisible (true);
             }
         });
 
@@ -405,13 +372,8 @@ public class ATMInterface extends JFrame implements ActionListener {
             public void actionPerformed (ActionEvent e) {
                 ((CardLayout)userInterface.getLayout()).show (userInterface, "singleAccountTrans");
                 actionStatus = 5;
-                depositButton.setVisible (false);
-                topUpButton.setVisible (false);
-                withdrawlButton.setVisible (false);
-                transferButton.setVisible (false);
-                collectButton.setVisible (false);
-                wireButton.setVisible (false);
-                payButton.setVisible (false);
+                setGridButtonsVisible (false);
+                purchaseButton.setVisible (true);
             }
         });
 
@@ -423,13 +385,8 @@ public class ATMInterface extends JFrame implements ActionListener {
                 ((CardLayout)userInterface.getLayout()).show (userInterface, "twoAccountTrans");
                 actionStatus = 6;
                 sendToField3.setVisible(false);
-                depositButton.setVisible (false);
-                topUpButton.setVisible (false);
-                withdrawlButton.setVisible (false);
-                purchaseButton.setVisible (false);
-                collectButton.setVisible (false);
-                wireButton.setVisible (false);
-                payButton.setVisible (false);
+                setGridButtonsVisible (false);
+                transferButton.setVisible (true);
 
 
                 ArrayList<Integer> allCheckingSavingAccts  = new ArrayList<>();
@@ -449,13 +406,8 @@ public class ATMInterface extends JFrame implements ActionListener {
                 ((CardLayout)userInterface.getLayout()).show (userInterface, "twoAccountTrans");
                 actionStatus = 7;
                 sendToField3.setVisible(false);
-                depositButton.setVisible (false);
-                topUpButton.setVisible (false);
-                withdrawlButton.setVisible (false);
-                purchaseButton.setVisible (false);
-                transferButton.setVisible (false);
-                wireButton.setVisible (false);
-                payButton.setVisible (false);
+                setGridButtonsVisible (false);
+                collectButton.setVisible (true);
             }
         });
         
@@ -468,13 +420,8 @@ public class ATMInterface extends JFrame implements ActionListener {
                 ((CardLayout)userInterface.getLayout()).show (userInterface, "twoAccountTrans");
                 actionStatus = 8;
                 sendToField3.setVisible(false);
-                depositButton.setVisible (false);
-                topUpButton.setVisible (false);
-                withdrawlButton.setVisible (false);
-                purchaseButton.setVisible (false);
-                transferButton.setVisible (false);
-                collectButton.setVisible (false);
-                payButton.setVisible (false);
+                setGridButtonsVisible (false);
+                wireButton.setVisible (true);
             }
         });
         
@@ -487,13 +434,8 @@ public class ATMInterface extends JFrame implements ActionListener {
                 ((CardLayout)userInterface.getLayout()).show (userInterface, "twoAccountTrans");
                 actionStatus = 9;
                 sendToDropDown.setVisible(false);
-                depositButton.setVisible (false);
-                topUpButton.setVisible (false);
-                withdrawlButton.setVisible (false);
-                purchaseButton.setVisible (false);
-                transferButton.setVisible (false);
-                collectButton.setVisible (false);
-                wireButton.setVisible (false);
+                setGridButtonsVisible (false);
+                payButton.setVisible(true);
             }
         });
 
@@ -517,6 +459,23 @@ public class ATMInterface extends JFrame implements ActionListener {
         
     
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+    }
+    
+    public void setGridButtonsVisible (boolean visible) {
+        depositButton.setVisible (visible);
+        topUpButton.setVisible (visible);
+        withdrawlButton.setVisible (visible);
+        purchaseButton.setVisible (visible);
+        transferButton.setVisible (visible);
+        collectButton.setVisible (visible);
+        wireButton.setVisible (visible);
+        payButton.setVisible (visible);
+    }
+    
+    public void idleView () {
+        ((CardLayout)userInterface.getLayout()).show (userInterface, "idleState");
+        actionStatus = 1;
+        setGridButtonsVisible(true);
     }
     
     public void actionPerformed(ActionEvent e){
