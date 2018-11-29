@@ -250,6 +250,19 @@ public class ATMInterface extends JFrame implements ActionListener {
                 {
                     //collect: Move money from the pocket account back to the linked checking/savings account, 
                     //there will be a 3% fee assessed.
+                    String fromAcct = comboBox3.getSelectedItem().toString();
+                    String toAcct = sendToDropDown.getSelectedItem().toString();
+                    String m = moneyChanged3.getText();
+
+                    java.sql.Date date = new java.sql.Date( java.lang.System.currentTimeMillis());
+                    if(fromAcct==null || m==null || toAcct==null)
+                    {
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
+                        return;
+                    } 
+
+                     Transaction fee = new Transaction(date,(float)(Float.parseFloat(m)*0.03), 10,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
+                     Transaction t = new Transaction(date,Float.parseFloat(m), 5,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
 
 
                 }
@@ -257,6 +270,22 @@ public class ATMInterface extends JFrame implements ActionListener {
                 {
                     //wire: move $ from savings or checking account and add it to another.
                     //customer must be owner + 2% fee
+
+                    String fromAcct = comboBox3.getSelectedItem().toString();
+                    String toAcct = sendToDropDown.getSelectedItem().toString();
+                    String m = moneyChanged3.getText();
+                   
+                    java.sql.Date date = new java.sql.Date( java.lang.System.currentTimeMillis());
+
+                    if(fromAcct==null || m==null || toAcct==null)
+                    {
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
+                        return;
+                    } 
+
+                    Transaction fee = new Transaction(date,(float)(Float.parseFloat(m)*0.02), 10,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
+                    Transaction t = new Transaction(date,Float.parseFloat(m), 4,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
+
 
 
                 }
@@ -344,14 +373,20 @@ public class ATMInterface extends JFrame implements ActionListener {
                 ArrayList<Integer> allAcctIDs =  new ArrayList<>();
                 for(int i =0; i<allCheckingSavingAccts.size(); i++)
                 {
+                    //System.out.println("we in: "+allCheckingSavingAccts.get(i).getAccountID());
                     allAcctIDs.add(allCheckingSavingAccts.get(i).getAccountID());
                 }
                 comboBox3.setModel(new DefaultComboBoxModel(allAcctIDs.toArray()));
 
-                 // ArrayList<Integer> pocketAccts  = new ArrayList<>();
-                 // pocketAccts.addAll(loggedCust.getPocketAccounts());
-                 // //TODO: fix!!!!!!!!! we need pocket accounts to workkkk
-                 // sendToDropDown.setModel(new DefaultComboBoxModel(allCheckingSavingAccts.toArray()));
+                 ArrayList<Integer> pocketAcctIDs  = new ArrayList<>();
+                 ArrayList<Account> pocketAccts = loggedCust.getAccountOfType(3);
+                 for(int i =0; i<pocketAccts.size(); i++)
+                 {
+                    //System.out.println("we in2: "+pocketAccts.get(i).getAccountID());
+                    pocketAcctIDs.add(pocketAccts.get(i).getAccountID());
+                 }
+                 
+                 sendToDropDown.setModel(new DefaultComboBoxModel(pocketAcctIDs.toArray()));
 
 
 
@@ -383,6 +418,9 @@ public class ATMInterface extends JFrame implements ActionListener {
             }
         });
 
+
+        //transfer: move money from checking/savings to another checking/savings
+        //must have atleast one owner in common, cannot exced over 2000 dollars
         transferButton = new JButton();
         transferButton.setText("Transfer");
         gridButtons.add(transferButton);
@@ -395,15 +433,24 @@ public class ATMInterface extends JFrame implements ActionListener {
                 transferButton.setVisible (true);
 
 
-                // ArrayList<Integer> allCheckingSavingAccts  = new ArrayList<>();
-                // allCheckingSavingAccts.addAll(loggedCust.getSavingsAccounts());
-                // allCheckingSavingAccts.addAll(loggedCust.getCheckingAccounts());
-                // comboBox3.setModel(new DefaultComboBoxModel(allCheckingSavingAccts.toArray()));
+               ArrayList<Account> allCheckingSavingAccts  = new ArrayList<>();
+                allCheckingSavingAccts.addAll(loggedCust.getAccountOfType(0));
+                allCheckingSavingAccts.addAll(loggedCust.getAccountOfType(1));
+                allCheckingSavingAccts.addAll(loggedCust.getAccountOfType(2));
 
-                // sendToDropDown.setModel(new DefaultComboBoxModel(allCheckingSavingAccts.toArray()));
+                ArrayList<Integer> allAcctIDs =  new ArrayList<>();
+                for(int i =0; i<allCheckingSavingAccts.size(); i++)
+                {
+                    //System.out.println("we in: "+allCheckingSavingAccts.get(i).getAccountID());
+                    allAcctIDs.add(allCheckingSavingAccts.get(i).getAccountID());
+                }
+                comboBox3.setModel(new DefaultComboBoxModel(allAcctIDs.toArray()));
+                sendToDropDown.setModel(new DefaultComboBoxModel(allAcctIDs.toArray()));
             }
         });
 
+        //collect: Move a specified amount of money from the pocket account back to the linked checking/savings account, 
+        //there will be a 3% fee assessed.
         collectButton = new JButton();
         collectButton.setText("Collect");
         gridButtons.add(collectButton);
@@ -414,6 +461,32 @@ public class ATMInterface extends JFrame implements ActionListener {
                 sendToField3.setVisible(false);
                 setGridButtonsVisible (false);
                 collectButton.setVisible (true);
+
+                 ArrayList<Account> allCheckingSavingAccts  = new ArrayList<>();
+                allCheckingSavingAccts.addAll(loggedCust.getAccountOfType(0));
+                allCheckingSavingAccts.addAll(loggedCust.getAccountOfType(1));
+                allCheckingSavingAccts.addAll(loggedCust.getAccountOfType(2));
+
+                ArrayList<Integer> allAcctIDs =  new ArrayList<>();
+                for(int i =0; i<allCheckingSavingAccts.size(); i++)
+                {
+                    //System.out.println("we in: "+allCheckingSavingAccts.get(i).getAccountID());
+                    allAcctIDs.add(allCheckingSavingAccts.get(i).getAccountID());
+                }
+                sendToDropDown.setModel(new DefaultComboBoxModel(allAcctIDs.toArray()));
+
+                 ArrayList<Integer> pocketAcctIDs  = new ArrayList<>();
+                 ArrayList<Account> pocketAccts = loggedCust.getAccountOfType(3);
+                 for(int i =0; i<pocketAccts.size(); i++)
+                 {
+                    //System.out.println("we in2: "+pocketAccts.get(i).getAccountID());
+                    pocketAcctIDs.add(pocketAccts.get(i).getAccountID());
+                 }
+                 
+                 comboBox3.setModel(new DefaultComboBoxModel(pocketAcctIDs.toArray()));
+
+
+
             }
         });
         
@@ -428,6 +501,20 @@ public class ATMInterface extends JFrame implements ActionListener {
                 sendToField3.setVisible(false);
                 setGridButtonsVisible (false);
                 wireButton.setVisible (true);
+
+                ArrayList<Account> allCheckingSavingAccts  = new ArrayList<>();
+                allCheckingSavingAccts.addAll(loggedCust.getAccountOfType(0));
+                allCheckingSavingAccts.addAll(loggedCust.getAccountOfType(1));
+                allCheckingSavingAccts.addAll(loggedCust.getAccountOfType(2));
+
+                ArrayList<Integer> allAcctIDs =  new ArrayList<>();
+                for(int i =0; i<allCheckingSavingAccts.size(); i++)
+                {
+                    //System.out.println("we in: "+allCheckingSavingAccts.get(i).getAccountID());
+                    allAcctIDs.add(allCheckingSavingAccts.get(i).getAccountID());
+                }
+                comboBox3.setModel(new DefaultComboBoxModel(allAcctIDs.toArray()));
+                sendToDropDown.setModel(new DefaultComboBoxModel(allAcctIDs.toArray()));
             }
         });
         
@@ -440,8 +527,20 @@ public class ATMInterface extends JFrame implements ActionListener {
                 ((CardLayout)userInterface.getLayout()).show (userInterface, "twoAccountTrans");
                 actionStatus = 9;
                 sendToDropDown.setVisible(false);
+                sendToField3.setVisible(true);
                 setGridButtonsVisible (false);
                 payButton.setVisible(true);
+
+                 ArrayList<Integer> pocketAcctIDs  = new ArrayList<>();
+                 ArrayList<Account> pocketAccts = loggedCust.getAccountOfType(3);
+                 for(int i =0; i<pocketAccts.size(); i++)
+                 {
+                    //System.out.println("we in2: "+pocketAccts.get(i).getAccountID());
+                    pocketAcctIDs.add(pocketAccts.get(i).getAccountID());
+                 }
+                 
+                 comboBox3.setModel(new DefaultComboBoxModel(pocketAcctIDs.toArray()));
+
             }
         });
 

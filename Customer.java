@@ -137,7 +137,7 @@ public class Customer {
         DatabaseHelper.getInstance().openConnection();
         
         String query1 = "SELECT A.account_id FROM Account A WHERE A.primOwner="+TID;
-        ArrayList<Account> accounts = new ArrayList <Account> ();
+        accounts = new ArrayList <Account> ();
         DatabaseHelper.getInstance().openConnection();
         ArrayList <Integer> accountNumbers = new ArrayList <Integer>();
         
@@ -170,7 +170,9 @@ public class Customer {
         
         for (int i = 0; i < accountNumbers.size(); i++) {
             accounts.add (new Account (accountNumbers.get (i)));
+            //System.out.println("populatng accts "+accountNumbers.get(i));
         }
+
 
         return accounts;
     }
@@ -207,12 +209,14 @@ public class Customer {
             getAccounts();
         }
         ArrayList <Account> accountsOfType = new ArrayList <Account>();
+        //System.out.println("ACCTS 2 " +accounts.size());
         for (int i = 0; i < accounts.size(); i++) {
             if (accounts.get(i).getAccountType() == accountType) {
                 accountsOfType.add (accounts.get(i));
+                System.out.println("added this acct type " +accounts.get(i).getAccountID());
             }
         }
-        
+        //System.out.println("accountsOfType "+ accountType+ " length "+accountsOfType.size());
         return accountsOfType;
     }
     
