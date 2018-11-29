@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class BankTellerInterface extends JFrame implements ActionListener{
+public class BankTellerInterface extends JFrame {
     JPanel gridButtons;
     JPanel userInterface;
     JPanel screen;
@@ -199,7 +199,7 @@ public class BankTellerInterface extends JFrame implements ActionListener{
         gridButtons.add(genMSButton);
         genMSButton.addActionListener (new ActionListener () {
             public void actionPerformed (ActionEvent e) {
-
+                JOptionPane.showMessageDialog(null, "Monthly Statement\nA\nB");
             }
         });
 
@@ -208,7 +208,7 @@ public class BankTellerInterface extends JFrame implements ActionListener{
         gridButtons.add(listClosedButton);
         listClosedButton.addActionListener (new ActionListener () {
             public void actionPerformed (ActionEvent e) {
-                
+                JOptionPane.showMessageDialog(null, "Closed Accounts\nA\nB");
             }
         });
 
@@ -217,7 +217,7 @@ public class BankTellerInterface extends JFrame implements ActionListener{
         gridButtons.add(genDTERButton);
         genDTERButton.addActionListener (new ActionListener () {
             public void actionPerformed (ActionEvent e) {
-                
+                JOptionPane.showMessageDialog(null, "DTER\nA\nB");
             }
         });
 
@@ -226,7 +226,7 @@ public class BankTellerInterface extends JFrame implements ActionListener{
         gridButtons.add(customerReportButton);
         customerReportButton.addActionListener(new ActionListener () {
             public void actionPerformed (ActionEvent e) {
-                
+                JOptionPane.showMessageDialog(null, "Customer Report\nA\nB");
             }
         });
 
@@ -235,7 +235,7 @@ public class BankTellerInterface extends JFrame implements ActionListener{
         gridButtons.add(addInterestButton);
         addInterestButton.addActionListener(new ActionListener () {
             public void actionPerformed (ActionEvent e) {
-                
+                JOptionPane.showMessageDialog(null, "Success/Failure");
             }
         });
 
@@ -255,7 +255,7 @@ public class BankTellerInterface extends JFrame implements ActionListener{
         gridButtons.add(delAcctButton);
         delAcctButton.addActionListener(new ActionListener () {
             public void actionPerformed (ActionEvent e) {
-                
+                JOptionPane.showMessageDialog(null, "Success/Failure");
             }
         });
 
@@ -277,9 +277,7 @@ public class BankTellerInterface extends JFrame implements ActionListener{
   
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
-    public void actionPerformed(ActionEvent e){
-            System.out.println("Oui!");
-    }
+
     
     public void setGridButtonsVisible (boolean visible) {
         checkTransButton.setVisible (visible);
