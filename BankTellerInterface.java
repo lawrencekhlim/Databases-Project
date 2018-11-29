@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class BankTellerInterface extends JFrame implements ActionListener{
+public class BankTellerInterface extends JFrame {
     JPanel gridButtons;
     JPanel userInterface;
     JPanel screen;
@@ -24,6 +24,7 @@ public class BankTellerInterface extends JFrame implements ActionListener{
     JTextField enterCheckTextField1;
     
     JTextField enterCustomerTextField2;
+    JTextField transactionTextField3;
     
 
 	public BankTellerInterface() {
@@ -83,7 +84,40 @@ public class BankTellerInterface extends JFrame implements ActionListener{
         
         JButton submit1 = new JButton ("Submit");
         submit1.addActionListener ( new ActionListener () {
-            public void actionPerformed (ActionEvent e) {
+            public void actionPerformed (ActionEvent ae) {
+                int TID = -1;
+                boolean cont = true;
+                Account c = null;
+                try { //Try to make the input into an integer
+                    TID = Integer.parseInt(accountNumberTextField1.getText());
+                    c = new Account (TID);
+                }
+                catch(Exception e) {
+                    cont = false;
+                }
+                
+                if (c == null || c.getPrimaryOwner() == -1) {
+                    cont = false;
+                }
+                
+                if (!cont) {
+                    JOptionPane.showMessageDialog(null, "Submit Failed: Invalid TID");
+                }
+                else {
+                    try { //Try to make the input into an integer
+                        float increase = Float.parseFloat(enterCheckTextField1.getText());
+                        Transaction trans = new Transaction (new java.sql.Date(java.lang.System.currentTimeMillis()), increase, 0, c.getAccountID(), -1);
+                        cont = trans.createTransaction();
+                    }
+                    catch(Exception e) {
+                        cont = false;
+                        JOptionPane.showMessageDialog(null, "Deposit Failed");
+                    }
+                }
+                
+                if (cont) {
+                    JOptionPane.showMessageDialog(null, "Deposit Success");
+                }
                 idleView();
             }
         });
@@ -101,11 +135,6 @@ public class BankTellerInterface extends JFrame implements ActionListener{
         
         createAcctPanel = new JPanel();
         createAcctPanel.setLayout(new FlowLayout());
-        /*
-        createAcctPanel.setOpaque(false);
-        createAcctPanel.setBackground(Color.WHITE);
-        createAcctPanel.setSize(150,150);
-        */
         JButton cancel2 = new JButton ("Cancel");
         cancel2.addActionListener ( new ActionListener (){
             public void actionPerformed (ActionEvent e) {
@@ -127,6 +156,7 @@ public class BankTellerInterface extends JFrame implements ActionListener{
         createAcctPanel.add(createAcctLabel2);
         createAcctPanel.add(enterCustomerTextField2);
         createAcctPanel.add(submit2);
+        
         //end create acct panel-----------------------------------------
 
         
@@ -134,16 +164,30 @@ public class BankTellerInterface extends JFrame implements ActionListener{
         
         delTransPanel = new JPanel();
         delTransPanel.setLayout(new FlowLayout());
-        /*
-        delTransPanel.setOpaque(false);
-        delTransPanel.setBackground(Color.WHITE);
-        delTransPanel.setSize(150,150);
-        */
-        
-        JLabel delTransLabel  = new JLabel();
-        delTransLabel.setText("Delete Transaction:");
 
-        delTransPanel.add(delTransLabel);
+        JButton cancel3 = new JButton ("Cancel");
+        cancel3.addActionListener ( new ActionListener (){
+            public void actionPerformed (ActionEvent e) {
+                idleView();
+            }
+        });
+        
+        JLabel delTransLabel3 = new JLabel();
+        delTransLabel3.setText("Delete Transaction:");
+        transactionTextField3 = new JTextField();
+        transactionTextField3.setPreferredSize(new Dimension(150,25));
+        
+        JButton submit3 = new JButton ("Submit");
+        submit3.addActionListener ( new ActionListener () {
+            public void actionPerformed (ActionEvent e) {
+                idleView();
+            }
+        });
+        
+        delTransPanel.add (cancel3);
+        delTransPanel.add (delTransLabel3);
+        delTransPanel.add (transactionTextField3);
+        delTransPanel.add (submit3);
         
         //delTransPanel-----------------------------------------
 
@@ -188,7 +232,7 @@ public class BankTellerInterface extends JFrame implements ActionListener{
         gridButtons.add(genMSButton);
         genMSButton.addActionListener (new ActionListener () {
             public void actionPerformed (ActionEvent e) {
-
+                JOptionPane.showMessageDialog(null, "Monthly Statement\nA\nB");
             }
         });
 
@@ -197,7 +241,7 @@ public class BankTellerInterface extends JFrame implements ActionListener{
         gridButtons.add(listClosedButton);
         listClosedButton.addActionListener (new ActionListener () {
             public void actionPerformed (ActionEvent e) {
-                
+                JOptionPane.showMessageDialog(null, "Closed Accounts\nA\nB");
             }
         });
 
@@ -206,7 +250,7 @@ public class BankTellerInterface extends JFrame implements ActionListener{
         gridButtons.add(genDTERButton);
         genDTERButton.addActionListener (new ActionListener () {
             public void actionPerformed (ActionEvent e) {
-                
+                JOptionPane.showMessageDialog(null, "DTER\nA\nB");
             }
         });
 
@@ -215,7 +259,7 @@ public class BankTellerInterface extends JFrame implements ActionListener{
         gridButtons.add(customerReportButton);
         customerReportButton.addActionListener(new ActionListener () {
             public void actionPerformed (ActionEvent e) {
-                
+                JOptionPane.showMessageDialog(null, "Customer Report\nA\nB");
             }
         });
 
@@ -224,7 +268,7 @@ public class BankTellerInterface extends JFrame implements ActionListener{
         gridButtons.add(addInterestButton);
         addInterestButton.addActionListener(new ActionListener () {
             public void actionPerformed (ActionEvent e) {
-                
+                JOptionPane.showMessageDialog(null, "Success/Failure");
             }
         });
 
@@ -244,7 +288,7 @@ public class BankTellerInterface extends JFrame implements ActionListener{
         gridButtons.add(delAcctButton);
         delAcctButton.addActionListener(new ActionListener () {
             public void actionPerformed (ActionEvent e) {
-                
+                JOptionPane.showMessageDialog(null, "Success/Failure");
             }
         });
 
@@ -253,7 +297,9 @@ public class BankTellerInterface extends JFrame implements ActionListener{
         gridButtons.add(delTransButton);
         delTransButton.addActionListener(new ActionListener () {
             public void actionPerformed (ActionEvent e) {
-                
+                ((CardLayout)userInterface.getLayout()).show (userInterface, "delTransPanel");
+                setGridButtonsVisible (false);
+                delTransButton.setVisible (true);
             }
         });
         //end grid buttons
@@ -264,9 +310,7 @@ public class BankTellerInterface extends JFrame implements ActionListener{
   
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
-    public void actionPerformed(ActionEvent e){
-            System.out.println("Oui!");
-    }
+
     
     public void setGridButtonsVisible (boolean visible) {
         checkTransButton.setVisible (visible);

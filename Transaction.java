@@ -61,7 +61,6 @@ public class Transaction {
         this.incrAcctID = incrAcctID;
         this.decrAcctID = decrAcctID;
         createID();
-        createTransaction();
     }
     
     

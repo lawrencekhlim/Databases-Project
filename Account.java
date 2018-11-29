@@ -39,6 +39,12 @@ public class Account {
             }
         } catch (SQLException e) {
         	e.printStackTrace();
+            accountID=-1;
+            accountType=0;
+            money=0.0;
+            deleteDate = null;
+            annualRate = 0;
+            primaryOwner = -1;
         }
 
         DatabaseHelper.getInstance ().closeConnection();
@@ -83,9 +89,9 @@ public class Account {
             stmt.setDouble (4, money);
             stmt.setInt (5, primaryOwner);
             stmt.setDouble(6, annualRate);
-            System.out.println ("Here!");
+            //System.out.println ("Here!");
             stmt.execute();
-            System.out.println ("Here2!");
+            //System.out.println ("Here2!");
         } catch (SQLException e) {
             System.err.println ("Execution failed");
             e.printStackTrace();
