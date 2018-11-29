@@ -71,7 +71,7 @@ public class Customer {
         this.name = name;
         this.address = address;
         this.PIN = PIN;
-        createCustomer();
+        //createCustomer();
     }
     
     public void createID () {

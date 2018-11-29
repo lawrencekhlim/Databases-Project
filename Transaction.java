@@ -70,6 +70,25 @@ public class Transaction {
         createID();
     }
     
+    public Transaction(int transaction_id, Date transDate, float moneyTrans, int transType, int incrAcctID, int decrAcctID){
+        this.transaction_id = transaction_id;
+        this.transDate = transDate;
+        this.moneyTrans = moneyTrans;
+    
+        
+        
+        
+        
+        this.transType = transType;
+        this.incrAcctID = incrAcctID;
+        this.decrAcctID = decrAcctID;
+    
+    
+    
+    
+    
+    }
+    
     
     public void createID () {
         try {

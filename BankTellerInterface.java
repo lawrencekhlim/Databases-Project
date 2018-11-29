@@ -227,8 +227,28 @@ public class BankTellerInterface extends JFrame {
                     // TODO Generate Monthly Statement
                     ArrayList <Account> accounts = c.getAccounts ();
                     String output = "Monthly Statement\n";
-                    
-
+                    for (Account account: accounts) {
+                        ArrayList<Customer> customers = account.getAccountOwners ();
+                        output+= "Account ID  " +account.getAccountID() +"\n";
+                        for (Customer customer: customers) {
+                            output+="Owner:  " + customer.getName()+ "  Address:  " + customer.getAddress() +"\n";
+                        }
+                        ArrayList <Transaction> transactions = account.getTransactions ();
+                        double accountBalance = account.getMoney();
+                        long day30 = 31l * 24 * 60 * 60 * 1000;
+                        for (Transaction transaction: transactions) {
+                            if (transaction.getTransactionDate().after(new Date(current.getTime() - day30))) {
+                                output+="Transaction ID:  " + transaction.getTransactionID()+ "  Date:  " + transaction.getTransactionDate() +"\n";
+                                if (transaction.getAccountIncreased() == account.getAccountID()) {
+                                    accountBalance -= transaction.getMoneyTransferred();
+                                }
+                                if (transaction.getAccountDecreased() == account.getAccountID()) {
+                                    accountBalance += transaction.getMoneyTransferred();
+                                }
+                            }
+                        }
+                        output += "Initial Balance :  " + accountBalance + "  Final Balance:  " + account.getMoney() +"\n\n";
+                    }
                     JOptionPane.showMessageDialog(null, output);
                     
                 } else if (!fail && customerActionStatus == 1) {
