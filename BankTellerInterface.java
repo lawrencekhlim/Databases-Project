@@ -3,6 +3,13 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class BankTellerInterface extends JFrame implements ActionListener{
+    JPanel gridButtons;
+    JPanel userInterface;
+    JPanel screen;
+    JPanel enterCheckPanel;
+    JPanel createAcctPanel;
+    JPanel delTransPanel;
+
 	public BankTellerInterface() {
         initUI();
     }
@@ -15,7 +22,8 @@ public class BankTellerInterface extends JFrame implements ActionListener{
        title.setText("Bank Teller");
        title.setVisible(true);
        
-       JPanel screen = new JPanel();
+       //screen -----------------------------------------------------
+        screen = new JPanel();
         screen.setLayout(new FlowLayout());
         screen.setOpaque(false);
         screen.setBackground(Color.WHITE);
@@ -31,17 +39,82 @@ public class BankTellerInterface extends JFrame implements ActionListener{
         screen.add(userInput);
         //screen.add(submitButton);
         screen.setVisible(true);
+        //_-----------------------------------------------------------
+
+        //enterCheckPanel --------------------------------------------
+        enterCheckPanel = new JPanel();
+        enterCheckPanel.setLayout(new FlowLayout());
+        enterCheckPanel.setOpaque(false);
+        enterCheckPanel.setBackground(Color.WHITE);
+        enterCheckPanel.setSize(150,150);
+
+        JLabel enterCheckLabel  = new JLabel();
+        enterCheckLabel.setText("Enter Check Values:");
+
+        enterCheckPanel.add(enterCheckLabel);
+        //end enter check panel-----------------------------------------
+
+        //createAcctPanrl --------------------------------------------
+        createAcctPanel = new JPanel();
+        createAcctPanel.setLayout(new FlowLayout());
+        createAcctPanel.setOpaque(false);
+        createAcctPanel.setBackground(Color.WHITE);
+        createAcctPanel.setSize(150,150);
+
+        JLabel createAcctLabel  = new JLabel();
+        createAcctLabel.setText("Create Account:");
+
+        enterCheckPanel.add(createAcctLabel);
+        //end create acct panel-----------------------------------------
+
+        //createAcctPanrl --------------------------------------------
+        delTransPanel = new JPanel();
+        delTransPanel.setLayout(new FlowLayout());
+        delTransPanel.setOpaque(false);
+        delTransPanel.setBackground(Color.WHITE);
+        delTransPanel.setSize(150,150);
+
+        JLabel delTransLabel  = new JLabel();
+        delTransLabel.setText("Delete Transaction:");
+
+        delTransPanel.add(delTransLabel);
+        //end create acct panel-----------------------------------------
 
 
 
+
+        // Beginning CardLayout-----------------------------------------------------------
+        
+        userInterface = new JPanel ();
+        userInterface.setLayout (new CardLayout());
+        userInterface.setSize (150, 150);
+        userInterface.add (screen, "idleState");
+        userInterface.add (enterCheckPanel, "enterCheckPanel");
+        userInterface.add (createAcctPanel, "createAcctPanel");
+        userInterface.add (delTransPanel, "delTransPanel");
+
+        
+        ((CardLayout)userInterface.getLayout()).show (userInterface, "idleState");
+        // End CardLayout---------------------------------------------------------------------
+
+
+
+        // Beginning GridButton-----------------------------------------------------------
         JPanel gridButtons = new JPanel();
-        screen.setLayout(new GridLayout(3,3));
+        gridButtons.setLayout(new GridLayout(3,3));
         gridButtons.setVisible(true);
 
 
         JButton checkTransButton = new JButton();
         checkTransButton.setText("Enter Check Transaction");
         gridButtons.add(checkTransButton);
+        checkTransButton.addActionListener (new ActionListener () {
+            public void actionPerformed (ActionEvent e) {
+                ((CardLayout)userInterface.getLayout()).show (userInterface, "enterCheckPanel");
+                //actionStatus = 4;
+                System.out.println("here");
+            }
+        });
 
         JButton genMSButton = new JButton();
         genMSButton.setText("Generate Monthly Statement");
@@ -74,6 +147,7 @@ public class BankTellerInterface extends JFrame implements ActionListener{
         JButton delTransButton = new JButton();
         delTransButton.setText("Delete Transactions");
         gridButtons.add(delTransButton); 
+        //end grid buttons
 
         getContentPane().add(title);
         getContentPane().add(gridButtons);

@@ -22,6 +22,8 @@ runTransactionTest:
 run:	
 	java -cp ".:ojdbc6.jar" ATMInterface
 	java -cp ".:ojdbc6.jar" JDBCExample
+
+runBankTeller:
 	java -cp ".:ojdbc6.jar" BankTellerInterface
 
 clean:
