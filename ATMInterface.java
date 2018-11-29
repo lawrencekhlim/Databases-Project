@@ -62,7 +62,7 @@ public class ATMInterface extends JFrame implements ActionListener {
         submitButton.addActionListener (new ActionListener () {
             public void actionPerformed (ActionEvent e) {
                 System.out.println("here");
-                gridButtons.setVisible(true);
+                //gridButtons.setVisible(true);
                 // ((CardLayout)userInterface.getLayout()).show (userInterface, "idleState");
                 String pinID =  userInput.getText();
                 System.out.println(pinID);
@@ -77,7 +77,7 @@ public class ATMInterface extends JFrame implements ActionListener {
                         loggedCust = new Customer(pinID);
                         System.out.print(loggedCust.getName());
                         gridButtons.setVisible(true);
-                        ((CardLayout)userInterface.getLayout()).show (userInterface, "idleState");
+                        idleView();
                     }
                 }
 
@@ -86,7 +86,6 @@ public class ATMInterface extends JFrame implements ActionListener {
                     JOptionPane.showMessageDialog(null, "ERROR! Pin is not linked to an account.");
 
                 }
-                idleView();
             }
         });
         
