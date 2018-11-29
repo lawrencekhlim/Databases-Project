@@ -1,7 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-
+import java.sql.*;
+import java.util.HashMap;
 public class BankTellerInterface extends JFrame {
     JPanel gridButtons;
     JPanel userInterface;
@@ -217,8 +218,9 @@ public class BankTellerInterface extends JFrame {
         genMSButton.setText("Generate Monthly Statement");
         gridButtons.add(genMSButton);
         genMSButton.addActionListener (new ActionListener () {
-            public void actionPerformed (ActionEvent e) {
-                JOptionPane.showMessageDialog(null, "Monthly Statement\nA\nB");
+            public void actionPerformed (ActionEvent ae) {
+                String output = "Monthly Statement\n";
+                JOptionPane.showMessageDialog(null, output);
             }
         });
 
@@ -226,8 +228,31 @@ public class BankTellerInterface extends JFrame {
         listClosedButton.setText("List Closed Accounts");
         gridButtons.add(listClosedButton);
         listClosedButton.addActionListener (new ActionListener () {
-            public void actionPerformed (ActionEvent e) {
-                JOptionPane.showMessageDialog(null, "Closed Accounts\nA\nB");
+            public void actionPerformed (ActionEvent ae) {
+                DatabaseHelper.getInstance().openConnection();
+                ResultSet rs = DatabaseHelper.getInstance().executeQuery ("SELECT A.account_id, A.deletedDate FROM Account A");
+                Date current = new java.sql.Date(java.lang.System.currentTimeMillis());
+                long day30 = 31l * 24 * 60 * 60 * 1000;
+                HashMap <Integer, Date> hashMap = new HashMap <> ();
+                try {
+                    while (rs.next()) {
+                        Date deleted = rs.getDate ("deletedDate");
+                        if (!rs.wasNull() && deleted.after(new Date((current.getTime() - day30)))) {
+                            hashMap.put (rs.getInt ("account_id"), deleted);
+                        }
+                    }
+                } catch (Exception e) {
+                    
+                }
+                DatabaseHelper.getInstance().closeConnection();
+                
+                String output = "Closed Accounts In Last 31 Days of " +current.toString() + ":\n";
+                for (Integer key: hashMap.keySet()) {
+                    output += "Account ID  "+ key + "  deleted on  " + hashMap.get (key).toString() +"\n";
+                    //output += key + "\t\t" +hashMap.get (key).toString() +"\n";
+                }
+                
+                JOptionPane.showMessageDialog(null, output);
             }
         });
 
