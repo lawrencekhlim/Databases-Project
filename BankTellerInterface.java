@@ -10,6 +10,7 @@ public class BankTellerInterface extends JFrame {
     JPanel enterCheckPanel;
     JPanel createAcctPanel;
     JPanel delTransPanel;
+    JPanel customerIDPanel;
     
     JButton checkTransButton;
     JButton genMSButton;
@@ -27,6 +28,8 @@ public class BankTellerInterface extends JFrame {
     JTextField enterCustomerTextField2;
     JTextField transactionTextField3;
     
+    JTextField customerTIDTextField4;
+    int customerActionStatus = 0;
 
 	public BankTellerInterface() {
         initUI();
@@ -117,7 +120,8 @@ public class BankTellerInterface extends JFrame {
         enterCheckPanel.add(submit1);
         
         //end enter check panel-----------------------------------------
-
+        
+        
         //createAcctPanel --------------------------------------------
         
         createAcctPanel = new JPanel();
@@ -136,6 +140,8 @@ public class BankTellerInterface extends JFrame {
         JButton submit2 = new JButton ("Submit");
         submit2.addActionListener ( new ActionListener () {
             public void actionPerformed (ActionEvent e) {
+                // TODO Create Account
+                
                 idleView();
             }
         });
@@ -145,6 +151,8 @@ public class BankTellerInterface extends JFrame {
         createAcctPanel.add(submit2);
         
         //end create acct panel-----------------------------------------
+        
+    
 
         
         //delTransPanrl --------------------------------------------
@@ -167,6 +175,8 @@ public class BankTellerInterface extends JFrame {
         JButton submit3 = new JButton ("Submit");
         submit3.addActionListener ( new ActionListener () {
             public void actionPerformed (ActionEvent e) {
+                // TODO Delete Transactions
+                
                 idleView();
             }
         });
@@ -178,6 +188,47 @@ public class BankTellerInterface extends JFrame {
         
         //delTransPanel-----------------------------------------
 
+        
+        
+        // Beginning enter Customer ID Panel
+        
+        customerIDPanel = new JPanel ();
+        
+        JButton cancel4 = new JButton ("Cancel");
+        cancel4.addActionListener ( new ActionListener (){
+            public void actionPerformed (ActionEvent e) {
+                idleView();
+            }
+        });
+        
+        JLabel customerTIDLabel4 = new JLabel();
+        customerTIDLabel4.setText("Customer TID:");
+        customerTIDTextField4 = new JTextField();
+        customerTIDTextField4.setPreferredSize(new Dimension(150,25));
+        
+        JButton submit4 = new JButton ("Submit");
+        submit4.addActionListener ( new ActionListener () {
+            public void actionPerformed (ActionEvent e) {
+                if (customerActionStatus == 0) {
+                    // TODO Generate Monthly Statement
+                    
+                    
+                } else if (customerActionStatus == 1) {
+                    // TODO Customer Report
+                    
+                    
+                }
+                idleView();
+            }
+        });
+        
+        customerIDPanel.add (cancel4);
+        customerIDPanel.add (customerTIDLabel4);
+        customerIDPanel.add (customerTIDTextField4);
+        customerIDPanel.add (submit4);
+        customerIDPanel.setVisible(true);
+        
+        // End Customer ID Panel
 
 
 
@@ -190,6 +241,7 @@ public class BankTellerInterface extends JFrame {
         userInterface.add (enterCheckPanel, "enterCheckPanel");
         userInterface.add (createAcctPanel, "createAcctPanel");
         userInterface.add (delTransPanel, "delTransPanel");
+        userInterface.add (customerIDPanel, "customerIDPanel");
 
         
         ((CardLayout)userInterface.getLayout()).show (userInterface, "idleState");
@@ -219,6 +271,12 @@ public class BankTellerInterface extends JFrame {
         gridButtons.add(genMSButton);
         genMSButton.addActionListener (new ActionListener () {
             public void actionPerformed (ActionEvent ae) {
+                customerActionStatus = 0;
+                
+                ((CardLayout)userInterface.getLayout()).show (userInterface, "customerIDPanel");
+                setGridButtonsVisible (false);
+                genMSButton.setVisible (true);
+                
                 String output = "Monthly Statement\n";
                 JOptionPane.showMessageDialog(null, output);
             }
@@ -261,6 +319,9 @@ public class BankTellerInterface extends JFrame {
         gridButtons.add(genDTERButton);
         genDTERButton.addActionListener (new ActionListener () {
             public void actionPerformed (ActionEvent e) {
+                // TODO Generate DTER
+                
+                
                 JOptionPane.showMessageDialog(null, "DTER\nA\nB");
             }
         });
@@ -270,6 +331,12 @@ public class BankTellerInterface extends JFrame {
         gridButtons.add(customerReportButton);
         customerReportButton.addActionListener(new ActionListener () {
             public void actionPerformed (ActionEvent e) {
+                customerActionStatus = 1;
+                
+                ((CardLayout)userInterface.getLayout()).show (userInterface, "customerIDPanel");
+                setGridButtonsVisible (false);
+                customerReportButton.setVisible (true);
+                
                 JOptionPane.showMessageDialog(null, "Customer Report\nA\nB");
             }
         });
@@ -279,6 +346,9 @@ public class BankTellerInterface extends JFrame {
         gridButtons.add(addInterestButton);
         addInterestButton.addActionListener(new ActionListener () {
             public void actionPerformed (ActionEvent e) {
+                // TODO Add Interest (Must put in a value in the database!)
+                
+                
                 JOptionPane.showMessageDialog(null, "Success/Failure");
             }
         });
@@ -299,6 +369,9 @@ public class BankTellerInterface extends JFrame {
         gridButtons.add(delAcctButton);
         delAcctButton.addActionListener(new ActionListener () {
             public void actionPerformed (ActionEvent e) {
+                // TODO Delete Closed Accounts
+                
+                
                 JOptionPane.showMessageDialog(null, "Success/Failure");
             }
         });
