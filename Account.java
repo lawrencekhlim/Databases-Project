@@ -102,6 +102,10 @@ public class Account {
 	public int getAccountType(){
 		return accountType;
 	}
+    
+    public int getPrimaryOwner () {
+        return primaryOwner;
+    }
 
 
 	public double getMoney(){

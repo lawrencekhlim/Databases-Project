@@ -6,6 +6,7 @@ public class Customer {
     private String name;
     private String address;
     private int PIN;
+    private ArrayList <Account> accounts;
     
     public Customer(){
         TID = 0;
@@ -129,131 +130,91 @@ public class Customer {
         return pins;
     }
 
-    //TODO: this doesn't work, only gets main accts
-    public ArrayList<Integer> getAllAccts(){
-        ArrayList<Integer> mainList = getMainAccounts();
-        mainList.addAll(getCoOwnerAcct());
-        return mainList;
-    }
-
-    public ArrayList <Integer> getMainAccounts () {
+    
+    public ArrayList <Account> getAccounts () {
+        accounts = new ArrayList <Account>();
+        
+        DatabaseHelper.getInstance().openConnection();
+        
         String query1 = "SELECT A.account_id FROM Account A WHERE A.primOwner="+TID;
-        //String query2 = "SELECT C.account_id FROM CoOwner C WHERE C.TID="+TID;
-        ArrayList<Integer> accounts = new ArrayList <Integer> ();
+        ArrayList<Account> accounts = new ArrayList <Account> ();
         DatabaseHelper.getInstance().openConnection();
-
+        ArrayList <Integer> accountNumbers = new ArrayList <Integer>();
+        
         try {
             ResultSet rs = DatabaseHelper.getInstance ().executeQuery(query1);
             while (rs.next()) {
                 int acctID = rs.getInt("account_id");
-                accounts.add (acctID);
-                System.out.println("primowerner act id "+acctID);
+                accountNumbers.add (acctID);
+                System.out.println("prim act id "+acctID);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         DatabaseHelper.getInstance().closeConnection();
         
-        return accounts;
-    }
-
-
-    //TODO: this doesn't work, only gets type 0 not 1
-     public ArrayList <Integer> getCheckingAccounts () {
-        //TODO: THIS doesn't accound for student checking...even thouhg the sql command works, it only returns type 0 no type 1
-        String query1 = "SELECT A.account_id FROM Account A WHERE A.primOwner="+TID+" AND (A.account_type=0 OR A.account_type=1)" ;
-        //String query2 = "SELECT C.account_id FROM CoOwner C WHERE C.TID="+TID;
-
-        ArrayList<Integer> accounts = new ArrayList <Integer> ();
-        DatabaseHelper.getInstance().openConnection();
-
-        try {
-            ResultSet rs = DatabaseHelper.getInstance ().executeQuery(query1);
-            while (rs.next()) {
-                int acctID = rs.getInt("account_id");
-                accounts.add (acctID);
-                System.out.println("primowerner act id "+acctID);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        DatabaseHelper.getInstance().closeConnection();
-        
-        return accounts;
-    }
-
-
-    public ArrayList <Integer> getSavingsAccounts () {
-        System.out.println("saving in");
-        //TODO: This query isnt working... not returning the rightthigns idk i legit copy pasted everything is bad
-        //fr tho i tested this on sql and it works.. just doesn't work here 
-        String query1 = "SELECT B.account_id FROM Account B WHERE B.primOwner="+TID+" AND B.account_type="+2+"" ;
-       
-        ArrayList<Integer> accounts = new ArrayList <Integer> ();
-        DatabaseHelper.getInstance().openConnection();
-
-        try {
-            // WE GET HERE 
-             System.out.println("saving in 2");
-            ResultSet rs = DatabaseHelper.getInstance ().executeQuery(query1);
-            while (rs.next()) {
-                //WE DON'T GET HERE THO
-                int acctID = rs.getInt("account_id");
-                accounts.add (acctID);
-                System.out.println("savings act id "+acctID);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        DatabaseHelper.getInstance().closeConnection();
-        
-        return accounts;
-    }
-
-     //TODO: guess what?? this also doesn't work at all
-    public ArrayList <Integer> getPocketAccounts () {
-       
-        String query1 = "SELECT A.account_id FROM Account A WHERE A.primOwner="+TID+" AND A.account_type=3" ;
-        //String query2 = "SELECT C.account_id FROM CoOwner C WHERE C.TID="+TID;
-        ArrayList<Integer> accounts = new ArrayList <Integer> ();
-        DatabaseHelper.getInstance().openConnection();
-
-        try {
-            ResultSet rs = DatabaseHelper.getInstance ().executeQuery(query1);
-            while (rs.next()) {
-                int acctID = rs.getInt("account_id");
-                accounts.add (acctID);
-                System.out.println("pcoket act id "+acctID);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        DatabaseHelper.getInstance().closeConnection();
-        
-        return accounts;
-    }
-
-    public ArrayList<Integer> getCoOwnerAcct(){
-        String query2 = "SELECT C.account_id FROM CoOwner C WHERE C.TID="+TID;
-        ArrayList<Integer> accounts = new ArrayList <Integer> ();
+        String query2 = "SELECT B.account_id FROM CoOwner B WHERE B.TID=" +TID;
+        System.out.println (query2);
         DatabaseHelper.getInstance().openConnection();
         try {
-            System.out.println("im here");
             ResultSet rs = DatabaseHelper.getInstance ().executeQuery(query2);
-            System.out.println(rs);
             while (rs.next()) {
-                  System.out.println("enter me");
                 int acctID = rs.getInt("account_id");
-                accounts.add (acctID);
-                  System.out.println("CoOwner acct id "+acctID);
+                accountNumbers.add (acctID);
+                System.out.println("act  id "+acctID);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         DatabaseHelper.getInstance().closeConnection();
+        
+        for (int i = 0; i < accountNumbers.size(); i++) {
+            accounts.add (new Account (accountNumbers.get (i)));
+        }
+
         return accounts;
+    }
+
+    public ArrayList <Account> getMainAccounts () {
+        if (accounts == null) {
+            getAccounts();
+        }
+        ArrayList <Account> mainAccounts = new ArrayList <Account>();
+        for (int i = 0; i < accounts.size(); i++) {
+            if (accounts.get(i).getPrimaryOwner() == TID) {
+                mainAccounts.add (accounts.get(i));
+            }
+        }
+        
+        return mainAccounts;
     }
     
+    public ArrayList<Account> getCoOwnedAccounts(){
+        if (accounts == null) {
+            getAccounts();
+        }
+        ArrayList <Account> coOwnedAccounts = new ArrayList <Account>();
+        for (int i = 0; i < accounts.size(); i++) {
+            if (accounts.get(i).getPrimaryOwner() == TID) {
+                coOwnedAccounts.add (accounts.get(i));
+            }
+        }
+        return coOwnedAccounts;
+    }
+
+    public ArrayList <Account> getAccountOfType (int accountType) {
+        if (accounts == null) {
+            getAccounts();
+        }
+        ArrayList <Account> accountsOfType = new ArrayList <Account>();
+        for (int i = 0; i < accounts.size(); i++) {
+            if (accounts.get(i).getAccountType() == accountType) {
+                accountsOfType.add (accounts.get(i));
+            }
+        }
+        
+        return accountsOfType;
+    }
     
     public int getID () {
         return TID;
@@ -309,8 +270,8 @@ public class Customer {
         // Customer c3 = new Customer (testSubjectA);
         // System.out.println (c2.getPIN());
 
-        Customer ctest =  new Customer(2);
-        System.out.println(ctest.getAllAccts().size());
+        Customer ctest = new Customer(2);
+        System.out.println(ctest.getAccounts());
     }
     
 }
