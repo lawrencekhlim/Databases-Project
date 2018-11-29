@@ -24,6 +24,7 @@ public class BankTellerInterface extends JFrame implements ActionListener{
     JTextField enterCheckTextField1;
     
     JTextField enterCustomerTextField2;
+    JTextField transactionTextField3;
     
 
 	public BankTellerInterface() {
@@ -101,11 +102,6 @@ public class BankTellerInterface extends JFrame implements ActionListener{
         
         createAcctPanel = new JPanel();
         createAcctPanel.setLayout(new FlowLayout());
-        /*
-        createAcctPanel.setOpaque(false);
-        createAcctPanel.setBackground(Color.WHITE);
-        createAcctPanel.setSize(150,150);
-        */
         JButton cancel2 = new JButton ("Cancel");
         cancel2.addActionListener ( new ActionListener (){
             public void actionPerformed (ActionEvent e) {
@@ -127,6 +123,7 @@ public class BankTellerInterface extends JFrame implements ActionListener{
         createAcctPanel.add(createAcctLabel2);
         createAcctPanel.add(enterCustomerTextField2);
         createAcctPanel.add(submit2);
+        
         //end create acct panel-----------------------------------------
 
         
@@ -134,16 +131,30 @@ public class BankTellerInterface extends JFrame implements ActionListener{
         
         delTransPanel = new JPanel();
         delTransPanel.setLayout(new FlowLayout());
-        /*
-        delTransPanel.setOpaque(false);
-        delTransPanel.setBackground(Color.WHITE);
-        delTransPanel.setSize(150,150);
-        */
-        
-        JLabel delTransLabel  = new JLabel();
-        delTransLabel.setText("Delete Transaction:");
 
-        delTransPanel.add(delTransLabel);
+        JButton cancel3 = new JButton ("Cancel");
+        cancel3.addActionListener ( new ActionListener (){
+            public void actionPerformed (ActionEvent e) {
+                idleView();
+            }
+        });
+        
+        JLabel delTransLabel3 = new JLabel();
+        delTransLabel3.setText("Delete Transaction:");
+        transactionTextField3 = new JTextField();
+        transactionTextField3.setPreferredSize(new Dimension(150,25));
+        
+        JButton submit3 = new JButton ("Submit");
+        submit3.addActionListener ( new ActionListener () {
+            public void actionPerformed (ActionEvent e) {
+                idleView();
+            }
+        });
+        
+        delTransPanel.add (cancel3);
+        delTransPanel.add (delTransLabel3);
+        delTransPanel.add (transactionTextField3);
+        delTransPanel.add (submit3);
         
         //delTransPanel-----------------------------------------
 
@@ -253,7 +264,9 @@ public class BankTellerInterface extends JFrame implements ActionListener{
         gridButtons.add(delTransButton);
         delTransButton.addActionListener(new ActionListener () {
             public void actionPerformed (ActionEvent e) {
-                
+                ((CardLayout)userInterface.getLayout()).show (userInterface, "delTransPanel");
+                setGridButtonsVisible (false);
+                delTransButton.setVisible (true);
             }
         });
         //end grid buttons
