@@ -89,9 +89,7 @@ public class Account {
             stmt.setDouble (4, money);
             stmt.setInt (5, primaryOwner);
             stmt.setDouble(6, annualRate);
-            //System.out.println ("Here!");
             stmt.execute();
-            //System.out.println ("Here2!");
         } catch (SQLException e) {
             System.err.println ("Execution failed");
             e.printStackTrace();
@@ -188,8 +186,8 @@ public class Account {
           } catch (Exception e) {
                 e.printStackTrace();
              
-           }
-           DatabaseHelper.getInstance().closeConnection();
+          }
+          DatabaseHelper.getInstance().closeConnection();
 
 	}
 

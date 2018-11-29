@@ -87,6 +87,7 @@ public class BankTellerInterface extends JFrame {
             public void actionPerformed (ActionEvent ae) {
                 int TID = -1;
                 boolean cont = true;
+                boolean success = false;
                 Account c = null;
                 try { //Try to make the input into an integer
                     TID = Integer.parseInt(accountNumberTextField1.getText());
@@ -107,7 +108,7 @@ public class BankTellerInterface extends JFrame {
                     try { //Try to make the input into an integer
                         float increase = Float.parseFloat(enterCheckTextField1.getText());
                         Transaction trans = new Transaction (new java.sql.Date(java.lang.System.currentTimeMillis()), increase, 0, c.getAccountID(), -1);
-                        cont = trans.createTransaction();
+                        success = trans.createTransaction();
                     }
                     catch(Exception e) {
                         cont = false;
@@ -115,8 +116,11 @@ public class BankTellerInterface extends JFrame {
                     }
                 }
                 
-                if (cont) {
+                if (success) {
                     JOptionPane.showMessageDialog(null, "Deposit Success");
+                }
+                else {
+                    JOptionPane.showMessageDialog(null, "Deposit Failed");
                 }
                 idleView();
             }

@@ -81,14 +81,13 @@ public class Transaction {
     
     public boolean createTransaction () {
         //createID();
+        Account decrAccount = null;
         if (decrAcctID != -1) {
-            Account decrAccount = new Account (decrAcctID);
-            if(decrAccount.getMoney()<moneyTrans)
-            {
-                System.out.println("NEGATIVE BALANEC");
+            decrAccount = new Account (decrAcctID);
+            if(decrAccount.getMoney()<moneyTrans) {
+                System.out.println("NEGATIVE BALANCE");
                 return false;
             }
-            decrAccount.setMoney (decrAccount.getMoney() - moneyTrans);
 
         }
         String query = "INSERT INTO Transaction (transaction_id, transDate, moneyTrans, transType, incrAcctID, decrAcctID) VALUES (?, ?, ?, ?, ?, ?)";
@@ -106,6 +105,11 @@ public class Transaction {
         } catch (SQLException e) {
             System.err.println ("Execution failed");
             e.printStackTrace();
+            return false;
+        }
+        
+        if (decrAcctID != -1) {
+            decrAccount.setMoney (decrAccount.getMoney() - moneyTrans);
         }
         
         if (incrAcctID != -1) {
