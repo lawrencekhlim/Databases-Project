@@ -6,8 +6,6 @@ compile:
 	javac -cp ".:ojdbc6.jar" -d . Account.java
 	javac -cp ".:ojdbc6.jar" -d . Transaction.java
 
-runExample:	
-	java -cp ".:ojdbc6.jar" JDBCExample
 	
 runCustomerTest:
 	java -cp ".:ojdbc6.jar" Customer
