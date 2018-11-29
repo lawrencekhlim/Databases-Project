@@ -336,15 +336,22 @@ public class ATMInterface extends JFrame implements ActionListener {
                 // we need to write better queries for differentiating between types for coOwner stuff
                 //as well
                 //POPULATION IN THE NATION
-                ArrayList<Integer> allCheckingSavingAccts  = new ArrayList<>();
-                allCheckingSavingAccts.addAll(loggedCust.getSavingsAccounts());
-                allCheckingSavingAccts.addAll(loggedCust.getCheckingAccounts());
-                comboBox3.setModel(new DefaultComboBoxModel(allCheckingSavingAccts.toArray()));
+                ArrayList<Account> allCheckingSavingAccts  = new ArrayList<>();
+                allCheckingSavingAccts.addAll(loggedCust.getAccountOfType(0));
+                allCheckingSavingAccts.addAll(loggedCust.getAccountOfType(1));
+                allCheckingSavingAccts.addAll(loggedCust.getAccountOfType(2));
 
-                 ArrayList<Integer> pocketAccts  = new ArrayList<>();
-                 pocketAccts.addAll(loggedCust.getPocketAccounts());
-                 //TODO: fix!!!!!!!!! we need pocket accounts to workkkk
-                 sendToDropDown.setModel(new DefaultComboBoxModel(allCheckingSavingAccts.toArray()));
+                ArrayList<Integer> allAcctIDs =  new ArrayList<>();
+                for(int i =0; i<allCheckingSavingAccts.size(); i++)
+                {
+                    allAcctIDs.add(allCheckingSavingAccts.get(i).getAccountID());
+                }
+                comboBox3.setModel(new DefaultComboBoxModel(allAcctIDs.toArray()));
+
+                 // ArrayList<Integer> pocketAccts  = new ArrayList<>();
+                 // pocketAccts.addAll(loggedCust.getPocketAccounts());
+                 // //TODO: fix!!!!!!!!! we need pocket accounts to workkkk
+                 // sendToDropDown.setModel(new DefaultComboBoxModel(allCheckingSavingAccts.toArray()));
 
 
 
@@ -388,12 +395,12 @@ public class ATMInterface extends JFrame implements ActionListener {
                 transferButton.setVisible (true);
 
 
-                ArrayList<Integer> allCheckingSavingAccts  = new ArrayList<>();
-                allCheckingSavingAccts.addAll(loggedCust.getSavingsAccounts());
-                allCheckingSavingAccts.addAll(loggedCust.getCheckingAccounts());
-                comboBox3.setModel(new DefaultComboBoxModel(allCheckingSavingAccts.toArray()));
+                // ArrayList<Integer> allCheckingSavingAccts  = new ArrayList<>();
+                // allCheckingSavingAccts.addAll(loggedCust.getSavingsAccounts());
+                // allCheckingSavingAccts.addAll(loggedCust.getCheckingAccounts());
+                // comboBox3.setModel(new DefaultComboBoxModel(allCheckingSavingAccts.toArray()));
 
-                sendToDropDown.setModel(new DefaultComboBoxModel(allCheckingSavingAccts.toArray()));
+                // sendToDropDown.setModel(new DefaultComboBoxModel(allCheckingSavingAccts.toArray()));
             }
         });
 
