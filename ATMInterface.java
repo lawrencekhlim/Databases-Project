@@ -155,6 +155,83 @@ public class ATMInterface extends JFrame implements ActionListener {
         
         JButton confirmButton2 = new JButton ();
         confirmButton2.setText ("Confirm");
+        confirmButton2.addActionListener (new ActionListener () {
+            public void actionPerformed (ActionEvent e) {
+                String acct = comboBox2.getSelectedItem().toString();
+                String m = moneyChanged2.getText();
+                   
+                java.sql.Date date = new java.sql.Date( java.lang.System.currentTimeMillis());
+                if(actionStatus==2)
+                {
+                    //deposit:Add money to the checking or savings account balance.
+                    if( m==null || acct==null)
+                    {
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
+                        return;
+                    }
+
+                    Transaction t = new Transaction(date,Float.parseFloat(m), 0,Integer.parseInt(acct),-1);
+                    boolean valid  = t.createTransaction();
+                    if(!valid)
+                    {
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
+                        return;
+                    }
+                    else
+                    {
+                        JOptionPane.showMessageDialog(null, "SUCCESS");
+                          return;
+                    }
+
+                }
+                else if(actionStatus==4)
+                {
+
+                    //withdrawl:subtract money to the checking or savings account balance.
+                    if( m==null || acct==null)
+                    {
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
+                        return;
+                    }
+
+                    Transaction t = new Transaction(date,Float.parseFloat(m), 2,-1,Integer.parseInt(acct));
+                    boolean valid  = t.createTransaction();
+                    if(!valid)
+                    {
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
+                        return;
+                    }
+                    else
+                    {
+                        JOptionPane.showMessageDialog(null, "SUCCESS");
+                          return;
+                    }
+                }
+                else if(actionStatus==5)
+                {
+                    //Purchase: Subtract money from the pocket account balance.
+                    if(m==null || acct==null)
+                    {
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
+                        return;
+                    }
+
+                    Transaction t = new Transaction(date,Float.parseFloat(m), 3,-1,Integer.parseInt(acct));
+                    boolean valid  = t.createTransaction();
+                    if(!valid)
+                    {
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
+                        return;
+                    }
+                    else
+                    {
+                        JOptionPane.showMessageDialog(null, "SUCCESS");
+                          return;
+                    }
+
+                }
+            }
+        });
         
         singleAccountTrans.add (cancelButton2);
         singleAccountTrans.add (accounts2);
@@ -219,7 +296,17 @@ public class ATMInterface extends JFrame implements ActionListener {
                     }
 
                     Transaction t = new Transaction(date,Float.parseFloat(m), 1,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
-
+                    boolean valid  = t.createTransaction();
+                    if(!valid)
+                    {
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
+                        return;
+                    }
+                    else
+                    {
+                        JOptionPane.showMessageDialog(null, "SUCCESS");
+                          return;
+                    }
 
                 }
                 else if(actionStatus==6)
@@ -241,10 +328,21 @@ public class ATMInterface extends JFrame implements ActionListener {
                         return;
                     } else if (Float.parseFloat(m)>2000){
                         JOptionPane.showMessageDialog(null, "ERROR! Money transferred cannot be above $2000.");
+                        return;
                     }
 
                     Transaction t = new Transaction(date,Float.parseFloat(m), 4,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
-
+                    boolean valid  = t.createTransaction();
+                    if(!valid)
+                    {
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
+                        return;
+                    }
+                    else
+                    {
+                        JOptionPane.showMessageDialog(null, "SUCCESS");
+                          return;
+                    }
                 }
                 else if(actionStatus==7)
                 {
@@ -263,7 +361,18 @@ public class ATMInterface extends JFrame implements ActionListener {
 
                      Transaction fee = new Transaction(date,(float)(Float.parseFloat(m)*0.03), 10,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
                      Transaction t = new Transaction(date,Float.parseFloat(m), 5,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
-
+                     float minMoney = (float)(new Account(Integer.parseInt(fromAcct))).getMoney();
+                     boolean valid  = t.createTransaction();
+                    if(!valid || minMoney<(float)(Float.parseFloat(m)*1.03))
+                    {
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
+                        return;
+                    }
+                    else
+                    {
+                        JOptionPane.showMessageDialog(null, "SUCCESS");
+                          return;
+                    }
 
                 }
                 else if(actionStatus==8)
@@ -284,20 +393,55 @@ public class ATMInterface extends JFrame implements ActionListener {
                     } 
 
                     Transaction fee = new Transaction(date,(float)(Float.parseFloat(m)*0.02), 10,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
-                    Transaction t = new Transaction(date,Float.parseFloat(m), 4,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
-
+                    Transaction t = new Transaction(date,Float.parseFloat(m), 4,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));   
+                    float minMoney = (float)(new Account(Integer.parseInt(fromAcct))).getMoney();
+                    boolean valid  = t.createTransaction();
+                    if(!valid || minMoney<(float)(Float.parseFloat(m)*1.03))
+                    {
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
+                        return;
+                    }
+                    else
+                    {
+                        JOptionPane.showMessageDialog(null, "SUCCESS");
+                          return;
+                    }
 
 
                 }
                 else if(actionStatus==9)
                 {
                     //payfriend: move from one pocket acct to another pocket acct
+                    String fromAcct = comboBox3.getSelectedItem().toString();
+                    String toAcct = sendToField3.getText();
+                    String m = moneyChanged3.getText();
+
+                    java.sql.Date date = new java.sql.Date( java.lang.System.currentTimeMillis());
+
+                    if(fromAcct==null || m==null || toAcct==null)
+                    {
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
+                        return;
+                    } 
+
+                    Transaction t = new Transaction(date,Float.parseFloat(m), 4,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));   
+                    boolean valid  = t.createTransaction();
+                    if(!valid)
+                    {
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
+                        return;
+                    }
+                    else
+                    {
+                        JOptionPane.showMessageDialog(null, "SUCCESS");
+                          return;
+                    }
 
 
                 }
                 else
                 {
-
+                    JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
                 }
             }
         });
@@ -336,6 +480,7 @@ public class ATMInterface extends JFrame implements ActionListener {
         gridButtons.setLayout(new GridLayout(4,2));
         gridButtons.setVisible(false);
 
+        //depost: Add money to the checking or savings account balance.
         depositButton = new JButton();
         depositButton.setText("Deposit");
         depositButton.addActionListener (new ActionListener () {
@@ -344,6 +489,20 @@ public class ATMInterface extends JFrame implements ActionListener {
                 actionStatus = 2;
                 setGridButtonsVisible (false);
                 depositButton.setVisible (true);
+
+                ArrayList<Account> allCheckingSavingAccts  = new ArrayList<>();
+                allCheckingSavingAccts.addAll(loggedCust.getAccountOfType(0));
+                allCheckingSavingAccts.addAll(loggedCust.getAccountOfType(1));
+                allCheckingSavingAccts.addAll(loggedCust.getAccountOfType(2));
+
+                ArrayList<Integer> allAcctIDs =  new ArrayList<>();
+                for(int i =0; i<allCheckingSavingAccts.size(); i++)
+                {
+                    //System.out.println("we in: "+allCheckingSavingAccts.get(i).getAccountID());
+                    allAcctIDs.add(allCheckingSavingAccts.get(i).getAccountID());
+                }
+                comboBox2.setModel(new DefaultComboBoxModel(allAcctIDs.toArray()));
+
             }
         });
         gridButtons.add(depositButton);
@@ -394,6 +553,7 @@ public class ATMInterface extends JFrame implements ActionListener {
             }
         });
 
+        //withdrawl: Subtract money from the checking or savings account balance.
         withdrawlButton = new JButton();
         withdrawlButton.setText("Withdrawal");
         gridButtons.add(withdrawlButton);
@@ -403,9 +563,24 @@ public class ATMInterface extends JFrame implements ActionListener {
                 actionStatus = 4;
                 setGridButtonsVisible (false);
                 withdrawlButton.setVisible (true);
+
+                ArrayList<Account> allCheckingSavingAccts  = new ArrayList<>();
+                allCheckingSavingAccts.addAll(loggedCust.getAccountOfType(0));
+                allCheckingSavingAccts.addAll(loggedCust.getAccountOfType(1));
+                allCheckingSavingAccts.addAll(loggedCust.getAccountOfType(2));
+
+                ArrayList<Integer> allAcctIDs =  new ArrayList<>();
+                for(int i =0; i<allCheckingSavingAccts.size(); i++)
+                {
+                    //System.out.println("we in: "+allCheckingSavingAccts.get(i).getAccountID());
+                    allAcctIDs.add(allCheckingSavingAccts.get(i).getAccountID());
+                }
+                comboBox2.setModel(new DefaultComboBoxModel(allAcctIDs.toArray()));
+
             }
         });
 
+        //purchase:  Subtract money from the pocket account balance.
         purchaseButton = new JButton();
         purchaseButton.setText("Purchase");
         gridButtons.add(purchaseButton);
@@ -415,6 +590,18 @@ public class ATMInterface extends JFrame implements ActionListener {
                 actionStatus = 5;
                 setGridButtonsVisible (false);
                 purchaseButton.setVisible (true);
+
+                 ArrayList<Integer> pocketAcctIDs  = new ArrayList<>();
+                 ArrayList<Account> pocketAccts = loggedCust.getAccountOfType(3);
+                 for(int i =0; i<pocketAccts.size(); i++)
+                 {
+                    //System.out.println("we in2: "+pocketAccts.get(i).getAccountID());
+                    pocketAcctIDs.add(pocketAccts.get(i).getAccountID());
+                 }
+                 
+                 comboBox2.setModel(new DefaultComboBoxModel(pocketAcctIDs.toArray()));
+
+
             }
         });
 
