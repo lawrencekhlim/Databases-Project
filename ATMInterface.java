@@ -167,20 +167,27 @@ public class ATMInterface extends JFrame implements ActionListener {
                     if( m==null || acct==null)
                     {
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
-                        return;
+                        
                     }
 
-                    Transaction t = new Transaction(date,Float.parseFloat(m), 0,Integer.parseInt(acct),-1);
+                    
+                    Transaction t = null;
+                    try{
+                        t = new Transaction(date,Float.parseFloat(m), 0,Integer.parseInt(acct),-1);
+                    } catch(NumberFormatException ex){
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Format.");
+                       
+                    }
                     boolean valid  = t.createTransaction();
                     if(!valid)
                     {
-                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
-                        return;
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Operation.");
+                     
                     }
                     else
                     {
                         JOptionPane.showMessageDialog(null, "SUCCESS");
-                          return;
+                          
                     }
 
                 }
@@ -191,20 +198,28 @@ public class ATMInterface extends JFrame implements ActionListener {
                     if( m==null || acct==null)
                     {
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
-                        return;
+                       
                     }
 
-                    Transaction t = new Transaction(date,Float.parseFloat(m), 2,-1,Integer.parseInt(acct));
+                    
+                    Transaction t = null;
+                    try{
+                        t = new Transaction(date,Float.parseFloat(m), 2,-1,Integer.parseInt(acct));
+
+                    } catch(NumberFormatException ex){
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Format.");
+                        
+                    }
                     boolean valid  = t.createTransaction();
                     if(!valid)
                     {
-                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
-                        return;
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Operation.");
+                        
                     }
                     else
                     {
                         JOptionPane.showMessageDialog(null, "SUCCESS");
-                          return;
+                          
                     }
                 }
                 else if(actionStatus==5)
@@ -213,23 +228,33 @@ public class ATMInterface extends JFrame implements ActionListener {
                     if(m==null || acct==null)
                     {
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
-                        return;
+                        
                     }
+                    Transaction t = null;
+                    try{
+                        t = new Transaction(date,Float.parseFloat(m), 3,-1,Integer.parseInt(acct));
 
-                    Transaction t = new Transaction(date,Float.parseFloat(m), 3,-1,Integer.parseInt(acct));
+                    } catch(NumberFormatException ex){
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Format.");
+                        
+                    }
+                    
                     boolean valid  = t.createTransaction();
                     if(!valid)
                     {
-                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
-                        return;
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Operation.");
+                        
                     }
                     else
                     {
                         JOptionPane.showMessageDialog(null, "SUCCESS");
-                          return;
+                          
                     }
 
+                   
                 }
+                 idleView();
+
             }
         });
         
@@ -292,20 +317,28 @@ public class ATMInterface extends JFrame implements ActionListener {
                     if(fromAcct==null || m==null || toAcct==null)
                     {
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
-                        return;
+                        
                     }
 
-                    Transaction t = new Transaction(date,Float.parseFloat(m), 1,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
+                    Transaction t = null;
+                    try{
+                        t = new Transaction(date,Float.parseFloat(m), 1,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
+                    }
+                    catch(NumberFormatException ex){
+
+                    }
+
+                    
                     boolean valid  = t.createTransaction();
                     if(!valid)
                     {
-                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
-                        return;
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Operation.");
+                        
                     }
                     else
                     {
                         JOptionPane.showMessageDialog(null, "SUCCESS");
-                          return;
+                         
                     }
 
                 }
@@ -325,23 +358,31 @@ public class ATMInterface extends JFrame implements ActionListener {
                     if(fromAcct==null || m==null || toAcct==null)
                     {
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
-                        return;
-                    } else if (Float.parseFloat(m)>2000){
-                        JOptionPane.showMessageDialog(null, "ERROR! Money transferred cannot be above $2000.");
-                        return;
+                        
                     }
 
-                    Transaction t = new Transaction(date,Float.parseFloat(m), 4,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
+                    Transaction t = null;
+                    try{
+                         t = new Transaction(date,Float.parseFloat(m), 4,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
+                    }catch(NumberFormatException ex){
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Format.");
+                        
+                    }
+                   
                     boolean valid  = t.createTransaction();
+                    if (Float.parseFloat(m)>2000){
+                        JOptionPane.showMessageDialog(null, "ERROR! Money transferred cannot be above $2000.");
+                        
+                    }
                     if(!valid)
                     {
-                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
-                        return;
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Operation.");
+                        
                     }
                     else
                     {
                         JOptionPane.showMessageDialog(null, "SUCCESS");
-                          return;
+                        
                     }
                 }
                 else if(actionStatus==7)
@@ -356,22 +397,36 @@ public class ATMInterface extends JFrame implements ActionListener {
                     if(fromAcct==null || m==null || toAcct==null)
                     {
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
-                        return;
+                        
                     } 
 
-                     Transaction fee = new Transaction(date,(float)(Float.parseFloat(m)*0.03), 10,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
-                     Transaction t = new Transaction(date,Float.parseFloat(m), 5,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
-                     float minMoney = (float)(new Account(Integer.parseInt(fromAcct))).getMoney();
-                     boolean valid  = t.createTransaction();
+                      Transaction fee = null;
+                    Transaction t = null;
+                    float minMoney = 0;
+                     try{
+                     fee = new Transaction(date,(float)(Float.parseFloat(m)*0.03), 10,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
+                        t = new Transaction(date,Float.parseFloat(m), 5,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));   
+                     minMoney = (float)(new Account(Integer.parseInt(fromAcct))).getMoney();
+                   
+                    }catch(NumberFormatException ex){
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Format.");
+                        
+                    }
+                    boolean valid = false;
+
+                    if(t!=null && fee!=null)
+                    {
+                        valid  = t.createTransaction() && fee.createTransaction();
+                    }
                     if(!valid || minMoney<(float)(Float.parseFloat(m)*1.03))
                     {
-                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
-                        return;
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Operation.");
+                       
                     }
                     else
                     {
                         JOptionPane.showMessageDialog(null, "SUCCESS");
-                          return;
+                          
                     }
 
                 }
@@ -389,22 +444,37 @@ public class ATMInterface extends JFrame implements ActionListener {
                     if(fromAcct==null || m==null || toAcct==null)
                     {
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
-                        return;
+                        
                     } 
 
-                    Transaction fee = new Transaction(date,(float)(Float.parseFloat(m)*0.02), 10,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
-                    Transaction t = new Transaction(date,Float.parseFloat(m), 4,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));   
-                    float minMoney = (float)(new Account(Integer.parseInt(fromAcct))).getMoney();
-                    boolean valid  = t.createTransaction();
-                    if(!valid || minMoney<(float)(Float.parseFloat(m)*1.03))
+                    Transaction fee = null;
+                    Transaction t = null;
+                    float minMoney = 0;
+                     try{
+                     fee = new Transaction(date,(float)(Float.parseFloat(m)*0.02), 10,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
+                        t = new Transaction(date,Float.parseFloat(m), 7,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));   
+                     minMoney = (float)(new Account(Integer.parseInt(fromAcct))).getMoney();
+                   
+                    }catch(NumberFormatException ex){
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Format.");
+                        
+                    }
+                    boolean valid = false;
+
+                    if(t!=null && fee!=null)
                     {
-                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
-                        return;
+                        valid  = t.createTransaction() && fee.createTransaction();
+                    }
+                   
+                    if(!valid || minMoney<(float)(Float.parseFloat(m)*1.02))
+                    {
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Operation.");
+                        
                     }
                     else
                     {
                         JOptionPane.showMessageDialog(null, "SUCCESS");
-                          return;
+                          
                     }
 
 
@@ -421,20 +491,28 @@ public class ATMInterface extends JFrame implements ActionListener {
                     if(fromAcct==null || m==null || toAcct==null)
                     {
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
-                        return;
+                        
                     } 
+                    Transaction t = null;
+                    try{
+                         t = new Transaction(date,Float.parseFloat(m), 6,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));   
 
-                    Transaction t = new Transaction(date,Float.parseFloat(m), 4,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));   
+                    }catch(NumberFormatException ex){
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Format.");
+                       
+                    }
+
+                   
                     boolean valid  = t.createTransaction();
                     if(!valid)
                     {
-                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
-                        return;
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Operation.");
+                      
                     }
                     else
                     {
                         JOptionPane.showMessageDialog(null, "SUCCESS");
-                          return;
+                         
                     }
 
 
@@ -443,7 +521,10 @@ public class ATMInterface extends JFrame implements ActionListener {
                 {
                     JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
                 }
+                idleView();
             }
+
+
         });
         
         twoAccountTrans.add (cancelButton3);
@@ -519,6 +600,7 @@ public class ATMInterface extends JFrame implements ActionListener {
                 sendToField3.setVisible(false);
                 setGridButtonsVisible (false);
                 topUpButton.setVisible (true);
+                sendToDropDown.setVisible(true);
 
                 //TODO: so nothing works right now, but whenever we get all the account stuff to work,
                 // we need to write better queries for differentiating between types for coOwner stuff
@@ -618,6 +700,7 @@ public class ATMInterface extends JFrame implements ActionListener {
                 sendToField3.setVisible(false);
                 setGridButtonsVisible (false);
                 transferButton.setVisible (true);
+                sendToDropDown.setVisible(true);
 
 
                ArrayList<Account> allCheckingSavingAccts  = new ArrayList<>();
@@ -648,6 +731,8 @@ public class ATMInterface extends JFrame implements ActionListener {
                 sendToField3.setVisible(false);
                 setGridButtonsVisible (false);
                 collectButton.setVisible (true);
+                sendToDropDown.setVisible(true);
+
 
                  ArrayList<Account> allCheckingSavingAccts  = new ArrayList<>();
                 allCheckingSavingAccts.addAll(loggedCust.getAccountOfType(0));
@@ -688,6 +773,7 @@ public class ATMInterface extends JFrame implements ActionListener {
                 sendToField3.setVisible(false);
                 setGridButtonsVisible (false);
                 wireButton.setVisible (true);
+                sendToDropDown.setVisible(true);
 
                 ArrayList<Account> allCheckingSavingAccts  = new ArrayList<>();
                 allCheckingSavingAccts.addAll(loggedCust.getAccountOfType(0));
