@@ -86,34 +86,16 @@ public class BankTellerInterface extends JFrame {
         submit1.addActionListener ( new ActionListener () {
             public void actionPerformed (ActionEvent ae) {
                 int TID = -1;
-                boolean cont = true;
                 boolean success = false;
-                Account c = null;
+
                 try { //Try to make the input into an integer
                     TID = Integer.parseInt(accountNumberTextField1.getText());
-                    c = new Account (TID);
+                    float increase = Float.parseFloat(enterCheckTextField1.getText());
+                    Transaction trans = new Transaction (new java.sql.Date(java.lang.System.currentTimeMillis()), increase, 0, TID, -1);
+                    success = trans.createTransaction();
                 }
                 catch(Exception e) {
-                    cont = false;
-                }
-                
-                if (c == null || c.getPrimaryOwner() == -1) {
-                    cont = false;
-                }
-                
-                if (!cont) {
-                    JOptionPane.showMessageDialog(null, "Submit Failed: Invalid TID");
-                }
-                else {
-                    try { //Try to make the input into an integer
-                        float increase = Float.parseFloat(enterCheckTextField1.getText());
-                        Transaction trans = new Transaction (new java.sql.Date(java.lang.System.currentTimeMillis()), increase, 0, c.getAccountID(), -1);
-                        success = trans.createTransaction();
-                    }
-                    catch(Exception e) {
-                        cont = false;
-                        JOptionPane.showMessageDialog(null, "Deposit Failed");
-                    }
+                    success = false;
                 }
                 
                 if (success) {

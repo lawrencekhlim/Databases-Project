@@ -33,6 +33,9 @@ public class Account {
                 accountType = rs.getInt("account_type");
 				money = rs.getFloat("moneyVal");
 				deleteDate =  rs.getDate("deletedDate");
+                if (rs.wasNull()) {
+                    deleteDate = null;
+                }
 				annualRate =  rs.getFloat("annualRate");
 				primaryOwner = rs.getInt("primOwner");
 				System.out.println("money val: "+money+ " primaryOwner: "+primaryOwner);
@@ -72,7 +75,6 @@ public class Account {
 		this.annualRate = aRate;
 		this.primaryOwner = primOwner;
 		createAccount();
-
 	}
 
 	 public void createAccount () {
@@ -84,7 +86,11 @@ public class Account {
         
         try {
             stmt.setInt (1, accountID);
-            stmt.setDate (2, deleteDate);
+            if (deleteDate == null)
+                stmt.setNull (2, Types.DATE);
+            else
+                stmt.setDate (2, deleteDate);
+            
             stmt.setInt (3, accountType);
             stmt.setDouble (4, money);
             stmt.setInt (5, primaryOwner);
