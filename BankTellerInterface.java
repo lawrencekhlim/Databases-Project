@@ -369,9 +369,47 @@ public class BankTellerInterface extends JFrame {
         
         JButton submit6 = new JButton ("Change");
         submit6.addActionListener ( new ActionListener () {
-            public void actionPerformed (ActionEvent e) {
-                // TODO Delete Transactions
-                //if (setAccountTypeTextField6.getText().equals ("1") || setAccountTypeTextField6.getText().equals ("1"))
+            public void actionPerformed (ActionEvent ae) {
+                int acctType = -1;
+                if (accountTypeTextField6.getText().equals ("0") || accountTypeTextField6.getText().equals ("InterestChecking")) {
+                    acctType = 0;
+                } else if (accountTypeTextField6.getText().equals ("1") || accountTypeTextField6.getText().equals ("StudentChecking")) {
+                    acctType = 1;
+                } else if (accountTypeTextField6.getText().equals ("2") || accountTypeTextField6.getText().equals ("Savings")) {
+                    acctType = 2;
+                } else if (accountTypeTextField6.getText().equals ("3") || accountTypeTextField6.getText().equals ("Pocket")) {
+                    acctType = 3;
+                } else {
+                    JOptionPane.showMessageDialog(null, "Account Type Input Not Recognized \"" + accountTypeTextField6.getText() + "\"");
+                }
+                
+                if (acctType != -1) {
+                    DatabaseHelper.getInstance().openConnection();
+                    boolean success = true;
+                    try {
+                        
+                        System.out.println  (Float.parseFloat (interestRateTextField6.getText()));
+                        //String updateQuery = "UPDATE Account SET annualRate="+Float.parseFloat (interestRateTextField6.getText()) + " WHERE account_type=" + acctType;
+                        String updateQuery = "UPDATE Account SET annualRate=? WHERE account_type=?";
+                        PreparedStatement stmt = DatabaseHelper.getInstance().createAction (updateQuery);
+                        stmt.setFloat (1, Float.parseFloat (interestRateTextField6.getText()));
+                        stmt.setInt (2, acctType);
+                        System.out.println ("Here");
+                        stmt.execute();
+                        
+                        System.out.println ("Here1");
+                    } catch (Exception e) {
+                        success = false;
+                    }
+                    System.out.println ("Here2");
+                    
+                    DatabaseHelper.getInstance().closeConnection();
+                    
+                    if (success) {
+                        JOptionPane.showMessageDialog(null, "Update Success");
+                    }  else
+                        JOptionPane.showMessageDialog(null, "Update Failed");
+                }
                 idleView();
             }
         });
@@ -408,7 +446,7 @@ public class BankTellerInterface extends JFrame {
 
         // Beginning GridButton-----------------------------------------------------------
         JPanel gridButtons = new JPanel();
-        gridButtons.setLayout(new GridLayout(3,4));
+        gridButtons.setLayout(new GridLayout(4,3));
         gridButtons.setVisible(true);
 
 

@@ -179,36 +179,37 @@ public class Account {
 
 
 	public void setMoney(double m){
-		  DatabaseHelper.getInstance().openConnection();
-          String updateQuery = "UPDATE Account SET moneyVal=? WHERE account_id=?";
-          PreparedStatement stmt = DatabaseHelper.getInstance ().createAction (updateQuery);
-          this.money = m;
-          try {
-                stmt.setDouble(1, m);
-                stmt.setInt(2, accountID);
-                stmt.execute();
-          } catch (Exception e) {
-                e.printStackTrace();
-             
-           }
-           DatabaseHelper.getInstance().closeConnection();
-
+        DatabaseHelper.getInstance().openConnection();
+        String updateQuery = "UPDATE Account SET moneyVal=? WHERE account_id=?";
+        PreparedStatement stmt = DatabaseHelper.getInstance ().createAction(updateQuery);
+        
+        this.money = m;
+        try {
+            stmt.setDouble(1, m);
+            stmt.setInt(2, accountID);
+            stmt.execute();
+        }catch (Exception e) {
+            e.printStackTrace();
+            
+        }
+        DatabaseHelper.getInstance().closeConnection();
 	}
 
 	public void setDeleteDate(java.sql.Date d){
-		  DatabaseHelper.getInstance().openConnection();
-          String updateQuery = "UPDATE Account SET deletedDate=? WHERE account_id=?";
-          PreparedStatement stmt = DatabaseHelper.getInstance ().createAction (updateQuery);
-          this.deleteDate = d;
-          try {
-                stmt.setDate(1, d);
-                stmt.setInt(2, accountID);
-                stmt.execute();
-          } catch (Exception e) {
-                e.printStackTrace();
+        DatabaseHelper.getInstance().openConnection();
+        String updateQuery = "UPDATE Account SET deletedDate=? WHERE account_id=?";
+        PreparedStatement stmt = DatabaseHelper.getInstance ().createAction(updateQuery);
+        
+        this.deleteDate = d;
+        try {
+            stmt.setDate(1, d);
+            stmt.setInt(2, accountID);
+            stmt.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
              
-           }
-           DatabaseHelper.getInstance().closeConnection();
+        }
+        DatabaseHelper.getInstance().closeConnection();
 
 	}
 
