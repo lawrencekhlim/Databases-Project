@@ -143,7 +143,9 @@ public class Transaction {
                 stmt.setNull (6, Types.INTEGER);
             else
                 stmt.setInt (6, decrAcctID);
+            System.out.println("tranID:"+transaction_id+ "  transDate:"+transDate+ " moneyTrans"+moneyTrans+" transType"+transType);
             stmt.execute();
+
         } catch (SQLException e) {
             System.err.println ("Execution failed");
             e.printStackTrace();

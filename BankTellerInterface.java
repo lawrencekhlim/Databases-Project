@@ -597,7 +597,7 @@ public class BankTellerInterface extends JFrame {
                             double money = rs.getDouble("moneyVal");
                             double intRate =  rs.getDouble("annualRate");
                             System.out.println(accountID+" "+money+" "+ intRate);
-                            Transaction t = new Transaction(current,(float)(money*(intRate-1)),9,accountID, -1, false);
+                            Transaction t = new Transaction(current,(float)(money*(intRate-1)/12),9,accountID, -1, false);
                             transactionsList.add(t);
                            
                         }
