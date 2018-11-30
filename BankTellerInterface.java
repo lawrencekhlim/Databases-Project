@@ -4,9 +4,10 @@ import java.awt.event.*;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.ArrayList;
+//import java.util.Date;
 
 public class BankTellerInterface extends JFrame {
-    Date current = new java.sql.Date(java.lang.System.currentTimeMillis());
+    java.sql.Date current = new java.sql.Date(java.lang.System.currentTimeMillis());
     
     JPanel gridButtons;
     JPanel userInterface;
@@ -327,7 +328,7 @@ public class BankTellerInterface extends JFrame {
                 try {
                     while (rs.next()) {
                         Date deleted = rs.getDate ("deletedDate");
-                        if (!rs.wasNull() && deleted.after(new Date((current.getTime() - day30)))) {
+                        if (!rs.wasNull() && deleted.after(new java.sql.Date((current.getTime() - day30)))) {
                             hashMap.put (rs.getInt ("account_id"), deleted);
                         }
                     }
@@ -377,11 +378,121 @@ public class BankTellerInterface extends JFrame {
         addInterestButton.addActionListener(new ActionListener () {
             public void actionPerformed (ActionEvent e) {
                 // TODO Add Interest (Must put in a value in the database!)
+                java.sql.Date date = new java.sql.Date( java.lang.System.currentTimeMillis());
+                String queryAddInterest = "UPDATE Account A SET A.moneyVal=A.moneyVal*A.annualRate";
+                String queryGetDate = "SELECT rateTrack.rateDate FROM RateTrack";
+                String querySetDate = "UPDATE rateTrack SET rateTrack.rateDate="+date;
+                String insertVal = "INSERT INTO RateTrack (rateDate) VALUES (?)";
+                boolean flag = false;
+                long day30 = 31l * 24 * 60 * 60 * 1000;
+
+               
+                java.sql.Date lastupdate = null;
+
+                //get last date
+                DatabaseHelper.getInstance().openConnection();
+                 try {
+                    ResultSet rs = DatabaseHelper.getInstance ().executeQuery(queryGetDate);
+                    flag = false; // isNotEmpty
+                    while (rs.next()) {
+                        lastupdate = rs.getDate ("rateDate");
+                        flag = true;
+                    }
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "ERROR");
+                    idleView();
+                    return;
+                }
+                DatabaseHelper.getInstance().closeConnection();
+
+                //if the table is empty, insert val
+
+                if(!flag) {
+                    //INSERT VAL
+                    DatabaseHelper.getInstance().openConnection();
+                    PreparedStatement stmt = DatabaseHelper.getInstance ().createAction (insertVal);
+                    try {
+                         stmt.setDate (1, current);
+                         stmt.execute();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(null, "ERROR");
+                            idleView();
+                            return;
+                    }
+                    DatabaseHelper.getInstance().closeConnection();
+
+
+                    //ADD INTEREST
+                    DatabaseHelper.getInstance().openConnection();
+                    try {
+                        ResultSet rs = DatabaseHelper.getInstance ().executeQuery(queryAddInterest);
+
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(null, "ERROR");
+                        idleView();
+                        return;
+                    }
+                    DatabaseHelper.getInstance().closeConnection();
+
+                }
+                else
+                {
+                    //check what teh date was --> if valid
+
+                    if(lastupdate.before(new java.sql.Date((current.getTime() - day30))))
+                    {
+                        //change date in db
+                        DatabaseHelper.getInstance().openConnection();
+                        try {
+                        ResultSet rs = DatabaseHelper.getInstance ().executeQuery(querySetDate);
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                            JOptionPane.showMessageDialog(null, "ERROR");
+                            idleView();
+                            return;
+                        }
+                        DatabaseHelper.getInstance().closeConnection();
+
+                         //ADD INTEREST
+                        DatabaseHelper.getInstance().openConnection();
+                        try {
+                            ResultSet rs = DatabaseHelper.getInstance ().executeQuery(queryAddInterest);
+
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                            JOptionPane.showMessageDialog(null, "ERROR");
+                            idleView();
+                            return;
+                        }
+                        DatabaseHelper.getInstance().closeConnection();
+                    }
+                    else
+                    {
+                        JOptionPane.showMessageDialog(null, "You already added Interest this month");
+                         idleView();
+                        return;
+                    }
+
+                }
+
+
                 
+               
+                JOptionPane.showMessageDialog(null, "SUCCESS");
+                 idleView();
+            
                 
+               
                 JOptionPane.showMessageDialog(null, "Success/Failure");
             }
+            
         });
+
+
 
         createAcctButton = new JButton();
         createAcctButton.setText("Create Account");
@@ -400,9 +511,33 @@ public class BankTellerInterface extends JFrame {
         delAcctButton.addActionListener(new ActionListener () {
             public void actionPerformed (ActionEvent e) {
                 // TODO Delete Closed Accounts
+                DatabaseHelper.getInstance().openConnection();
+                String query = " DELETE FROM Account T WHERE T.deletedDate IS NOT NULL";
+
+        
+               try {
+                    ResultSet rs = DatabaseHelper.getInstance ().executeQuery(query);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(null, "ERROR");
+                    }
+                DatabaseHelper.getInstance().closeConnection();
+
+                DatabaseHelper.getInstance().openConnection();
+                String query2 = "DELETE FROM Customer C WHERE C.TID NOT IN (SELECT primOwner FROM Account UNION SELECT TID FROM CoOwner)";
+               try {
+                    ResultSet rs = DatabaseHelper.getInstance ().executeQuery(query2);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(null, "ERROR");
+                    }
+                DatabaseHelper.getInstance().closeConnection();
+
+                JOptionPane.showMessageDialog(null, "SUCCESS");
+                 idleView();
+            
                 
-                
-                JOptionPane.showMessageDialog(null, "Success/Failure");
+        
             }
         });
 
@@ -411,10 +546,26 @@ public class BankTellerInterface extends JFrame {
         gridButtons.add(delTransButton);
         delTransButton.addActionListener(new ActionListener () {
             public void actionPerformed (ActionEvent e) {
-                ((CardLayout)userInterface.getLayout()).show (userInterface, "delTransPanel");
+                ((CardLayout)userInterface.getLayout()).show (userInterface, "idleState");
                 setGridButtonsVisible (false);
                 delTransButton.setVisible (true);
+
+                DatabaseHelper.getInstance().openConnection();
+                String query = "DELETE FROM Transaction";
+        
+               try {
+                    ResultSet rs = DatabaseHelper.getInstance ().executeQuery(query);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(null, "ERROR");
+                    }
+                DatabaseHelper.getInstance().closeConnection();
+
+
+                JOptionPane.showMessageDialog(null, "SUCCESS");
+                 idleView();
             }
+           
         });
         //end grid buttons
 
@@ -423,6 +574,7 @@ public class BankTellerInterface extends JFrame {
         getContentPane().add(gridButtons);
   
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        
     }
 
     

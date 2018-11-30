@@ -28,3 +28,5 @@ CREATE TABLE Transaction ( transaction_id 	INTEGER,
 						   PRIMARY KEY(transaction_id),
 						   FOREIGN KEY(incrAcctID) REFERENCES Account(account_id) ON DELETE SET NULL,
 						   FOREIGN KEY(decrAcctID) REFERENCES Account(account_id) ON DELETE SET NULL);
+
+ CREATE TABLE RateTrack(rateDate DATE);

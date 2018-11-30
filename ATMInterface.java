@@ -400,11 +400,11 @@ public class ATMInterface extends JFrame implements ActionListener {
                         
                     } 
 
-                      Transaction fee = null;
+                    Transaction fee = null;
                     Transaction t = null;
                     float minMoney = 0;
-                     try{
-                     fee = new Transaction(date,(float)(Float.parseFloat(m)*0.03), 10,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
+                    try{
+                        fee = new Transaction(date,(float)(Float.parseFloat(m)*0.03), 10,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
                         t = new Transaction(date,Float.parseFloat(m), 5,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));   
                      minMoney = (float)(new Account(Integer.parseInt(fromAcct))).getMoney();
                    

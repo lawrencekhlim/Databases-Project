@@ -215,7 +215,7 @@ public class Customer {
         for (int i = 0; i < accounts.size(); i++) {
             if (accounts.get(i).getAccountType() == accountType) {
                 accountsOfType.add (accounts.get(i));
-                System.out.println("added this acct type " +accounts.get(i).getAccountID());
+                //System.out.println("added this acct type " +accounts.get(i).getAccountID());
             }
         }
         //System.out.println("accountsOfType "+ accountType+ " length "+accountsOfType.size());
