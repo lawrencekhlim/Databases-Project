@@ -29,4 +29,13 @@ CREATE TABLE Transaction ( transaction_id 	INTEGER,
 						   FOREIGN KEY(incrAcctID) REFERENCES Account(account_id) ON DELETE SET NULL,
 						   FOREIGN KEY(decrAcctID) REFERENCES Account(account_id) ON DELETE SET NULL);
 
- CREATE TABLE RateTrack(rateDate DATE);
+CREATE TABLE PocketAccount (account_id      INTEGER,
+                            linked_account  INTEGER,
+                            recent_fee      DATE,
+                            PRIMARY KEY (account_id),
+                            FOREIGN KEY (account_id) REFERENCES Account (account_id),
+                            FOREIGN KEY (linked_account) REFERENCES Account (account_id));
+
+CREATE TABLE RateTrack(rateDate DATE);
+
+

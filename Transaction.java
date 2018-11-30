@@ -158,7 +158,7 @@ public class Transaction {
         
         if (decrAcctID != -1) {
             decrAccount.setMoney (decrAccount.getMoney() - moneyTrans);
-            if(decrAccount.getMoney() <=.01) {
+            if(decrAccount.getMoney() <=.01 && decrAccount.getAccountType() != 3) {
                 //System.out.println("NEGATIVE BALANCE");
                 decrAccount.setDeleteDate(transDate);
             }
@@ -172,6 +172,42 @@ public class Transaction {
         System.out.println (query);
         return true;
         
+    }
+    
+    public boolean createPocketTransaction (java.sql.Date current) {
+        
+        Account decrAccount = null;
+        if (decrAcctID != -1) {
+            decrAccount = new Account (decrAcctID);
+            Date recfee = decrAccount.getRecentFee ();
+            long day30 = 31l * 24 * 60 * 60 * 1000;
+            if (!recfee.after(new Date(current.getTime() - day30))) {
+                return createTransaction ();
+            }
+            else if((recfee.after(new Date(current.getTime() - day30)) && decrAccount.getMoney() >= moneyTrans + 5)) {
+                System.out.println("NEGATIVE BALANCE or closed account");
+                if (createTransaction()) {
+                    Transaction fee = new Transaction (current, 5, 10, -1, decrAcctID);
+                    
+                    DatabaseHelper.getInstance().openConnection();
+                    String query = "UPDATE PocketAccount SET recent_fee=? WHERE account_id=?";
+                    PreparedStatement stmt = DatabaseHelper.getInstance().createAction(query);
+                    try {
+                        stmt.setDate (1, current);
+                        stmt.setInt (2, decrAcctID);
+                        stmt.execute();
+                    } catch (Exception e) {
+                        System.out.println ("FAILED Update FEE Transaction Date");
+                    }
+                    
+                    DatabaseHelper.getInstance().closeConnection();
+                    
+                    return fee.createTransaction();
+                } else
+                    return false;
+            }
+        }
+        return false;
     }
     
     public int getTransactionID () {

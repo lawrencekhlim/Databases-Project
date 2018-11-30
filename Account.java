@@ -118,7 +118,7 @@ public class Account {
             success = false;
             e.printStackTrace();
         }
-        System.out.println ("After execution");
+        //System.out.println ("After execution");
         DatabaseHelper.getInstance().closeConnection();
         
         if (success && (accountType == 0 || accountType == 1 || accountType == 2) && current != null) {
@@ -128,7 +128,85 @@ public class Account {
         return success;
     }
     
-    //public boolean createLinkedAccount (int accountID) { }
+    public boolean createLinkedAccount (int linkedAccountID) {
+        // Check that the linked account is one that the owner owns
+        Account d = new Account (linkedAccountID);
+        ArrayList <Customer> customers = d.getAccountOwners ();
+        boolean passOwnerTest = false;
+        for (Customer customer: customers) {
+            if (customer.getID() == primaryOwner) {
+                passOwnerTest = true;
+            }
+        }
+        
+        if (d.getAccountType () == 3 || !(d.getMoney () > 0) || !passOwnerTest) {
+            return false;
+        }
+        
+        DatabaseHelper.getInstance().openConnection();
+        String query = "INSERT INTO PocketAccount (account_id, linked_account, recent_fee) VALUES (?, ?, ?)";
+        boolean success = true;
+        PreparedStatement stmt = DatabaseHelper.getInstance().createAction (query);
+        try {
+            stmt.setInt (1, accountID);
+            stmt.setInt (2, linkedAccountID);
+            stmt.setNull (3, Types.DATE);
+            stmt.execute();
+        } catch (Exception e) {
+            success = false;
+        }
+        DatabaseHelper.getInstance().closeConnection();
+        return success;
+    }
+    
+    public java.sql.Date getRecentFee () {
+        java.sql.Date recent = null;
+        if (accountType == 3) {
+            DatabaseHelper.getInstance().openConnection();
+            String query = "SELECT A.recent_fee FROM PocketAccount A WHERE A.account_id=" + accountID;
+            try {
+                ResultSet rs = DatabaseHelper.getInstance().executeQuery (query);
+                if (rs.next()) {
+                    recent = rs.getDate ("recent_fee");
+                    if (rs.wasNull()) {
+                        recent = null;
+                    }
+                }
+            } catch (Exception e) {
+                recent = null;
+            }
+        }
+        return recent;
+    }
+    
+    public Account getLinkedAccount () {
+        Account linked = null;
+        int linkedID = -1;
+        if (accountType == 3) {
+            
+            DatabaseHelper.getInstance().openConnection();
+            //String query = "SELECT B.account_id, B.deletedDate, B.account_type, B.moneyVal, B.primOwner, B.annualRate FROM PocketAccount A, Account B WHERE A.linked_account=B.account_id A.account_id=" + accountID;
+            String query = "SELECT A.linked_account FROM PocketAccount A WHERE A.account_id=" + accountID;
+            try {
+                ResultSet rs = DatabaseHelper.getInstance().executeQuery (query);
+                if (rs.next()) {
+                    linkedID = rs.getInt ("linked_account");
+                    if (rs.wasNull()) {
+                        linkedID = -1;
+                    }
+                }
+                else {
+                    linkedID = -1;
+                }
+            } catch (Exception e) {
+                linkedID = -1;
+            }
+        }
+        if (linkedID != -1)
+            return new Account (linkedID);
+        else
+            return null;
+    }
                                               
     public boolean createAccount () {
         return createAccount (null);
