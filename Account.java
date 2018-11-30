@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.ArrayList;
 //checking mums
 //0 - interest checking
-//1 -  student checking
+//1 - student checking
 //2 - savings 
 //3 - pocket 
 public class Account {
@@ -77,9 +77,20 @@ public class Account {
 		this.primaryOwner = primOwner;
 		createAccount();
 	}
+    
+    public Account(int actT, double m, java.sql.Date dDate, double aRate, int primOwner, boolean callCreateAccount){
+        this.accountType = actT;
+        this.money = m;
+        this.deleteDate = dDate;
+        this.annualRate = aRate;
+        this.primaryOwner = primOwner;
+        if (callCreateAccount)
+            createAccount();
+    }
 
-	 public void createAccount () {
+    public boolean createAccount (java.sql.Date current) {
         generateAccountID();
+        boolean success = true;
         String query = "INSERT INTO Account (account_id, deletedDate, account_type, moneyVal, primOwner, annualRate) VALUES (?, ?, ?, ?, ?, ?)";
         System.out.println (query);
         DatabaseHelper.getInstance().openConnection();
@@ -93,17 +104,34 @@ public class Account {
                 stmt.setDate (2, deleteDate);
             
             stmt.setInt (3, accountType);
-            stmt.setDouble (4, money);
+            if ((accountType == 0 || accountType == 1 || accountType == 2) && current != null) {
+                stmt.setDouble (4, 0.0);
+            }
+            else {
+                stmt.setDouble (4, money);
+            }
             stmt.setInt (5, primaryOwner);
             stmt.setDouble(6, annualRate);
             stmt.execute();
         } catch (SQLException e) {
             System.err.println ("Execution failed");
+            success = false;
             e.printStackTrace();
         }
         System.out.println ("After execution");
         DatabaseHelper.getInstance().closeConnection();
         
+        if (success && (accountType == 0 || accountType == 1 || accountType == 2) && current != null) {
+            Transaction t = new Transaction (current, (float)money, 0, accountID, -1);
+            t.createTransaction();
+        }
+        return success;
+    }
+    
+    //public boolean createLinkedAccount (int accountID) { }
+                                              
+    public boolean createAccount () {
+        return createAccount (null);
     }
     
     public ArrayList <Transaction> getTransactions () {

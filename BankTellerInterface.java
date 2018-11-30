@@ -319,16 +319,23 @@ public class BankTellerInterface extends JFrame {
                         idleView();
                         return;
                     }
-                    
+                    boolean createdAccount = true;
                     Account a;
                     try {
-                        a = new Account (acctType, money, null, interest_rate, Integer.parseInt (enterCustomerTextField2.getText()));
+                        a = new Account (acctType, money, null, interest_rate, Integer.parseInt (enterCustomerTextField2.getText()), false);
+                        createdAccount = a.createAccount (current);
                     } catch (Exception e) {
+                        createdAccount = false;
+                        return;
+                    }
+                    if (createdAccount) {
+                        JOptionPane.showMessageDialog(null, "Create Account Success");
+                    }
+                    else {
                         JOptionPane.showMessageDialog(null, "Create Account Failed");
                         idleView();
                         return;
                     }
-                    JOptionPane.showMessageDialog(null, "Create Account Success");
                     
                     if (!enterCoOwnersTextField8.getText().equals("")) {
                         String [] arr = enterCoOwnersTextField8.getText().split(",");

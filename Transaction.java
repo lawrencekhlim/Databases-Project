@@ -15,7 +15,7 @@ import java.util.ArrayList;
 //10 - fees
 
 public class Transaction {
-     java.sql.Date current = new java.sql.Date(java.lang.System.currentTimeMillis());
+     //java.sql.Date current = new java.sql.Date(java.lang.System.currentTimeMillis());
     private int transaction_id;
     private Date transDate;
     private float moneyTrans;
@@ -83,18 +83,10 @@ public class Transaction {
         this.transaction_id = transaction_id;
         this.transDate = transDate;
         this.moneyTrans = moneyTrans;
-    
-        
-        
-        
         
         this.transType = transType;
         this.incrAcctID = incrAcctID;
         this.decrAcctID = decrAcctID;
-    
-    
-    
-    
     
     }
     
@@ -116,22 +108,28 @@ public class Transaction {
     
     public boolean createTransaction () {
         //createID();
+        //System.out.println ("Hello");
         Account decrAccount = null;
         if (decrAcctID != -1) {
             decrAccount = new Account (decrAcctID);
-            if(decrAccount.getMoney()<moneyTrans) {
-                System.out.println("NEGATIVE BALANCE");
+            if(decrAccount.getMoney()<moneyTrans || decrAccount.getDeleteDate() != null) {
+                System.out.println("NEGATIVE BALANCE or closed account");
                 return false;
             }
-            else if(decrAccount.getMoney()-moneyTrans<.01) {
-                System.out.println("NEGATIVE BALANCE");
-                decrAccount.setDeleteDate(current);
+        }
+        
+        //System.out.println ("Hello");
+        Account incrAccount = null;
+        if (incrAcctID != -1) {
+            incrAccount = new Account (incrAcctID);
+            if (incrAccount.getDeleteDate() != null) {
+                System.out.println("closed account");
+                return false;
             }
-
         }
         
         String query = "INSERT INTO Transaction (transaction_id, transDate, moneyTrans, transType, incrAcctID, decrAcctID) VALUES (?, ?, ?, ?, ?, ?)";
-        
+        System.out.println (query);
         DatabaseHelper.getInstance().openConnection();
         PreparedStatement stmt = DatabaseHelper.getInstance ().createAction (query);
         
@@ -156,17 +154,22 @@ public class Transaction {
             e.printStackTrace();
             return false;
         }
+        DatabaseHelper.getInstance().closeConnection();
         
         if (decrAcctID != -1) {
             decrAccount.setMoney (decrAccount.getMoney() - moneyTrans);
+            if(decrAccount.getMoney() <=.01) {
+                //System.out.println("NEGATIVE BALANCE");
+                decrAccount.setDeleteDate(transDate);
+            }
         }
         
+        System.out.println (query);
         if (incrAcctID != -1) {
-            Account incrAccount = new Account (incrAcctID);
+            //Account incrAccount = new Account (incrAcctID);
             incrAccount.setMoney (incrAccount.getMoney() + moneyTrans);
         }
-        
-        DatabaseHelper.getInstance().closeConnection();
+        System.out.println (query);
         return true;
         
     }
