@@ -379,7 +379,7 @@ public class ATMInterface extends JFrame {
                         JOptionPane.showMessageDialog(null, "ERROR! Money transferred cannot be above $2000.");
                         
                     }
-                    if(!valid)
+                    else if(!valid)
                     {
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Operation.");
                         
@@ -419,9 +419,13 @@ public class ATMInterface extends JFrame {
                     }
                     boolean valid = false;
 
-                    if(t!=null && fee!=null)
-                    {
-                        valid  = t.createTransaction() && fee.createTransaction();
+                   
+                    if(t!=null && fee!=null) {
+                       boolean  valid1 = t.createTransaction();
+                       fee.createID();
+                        boolean valid2 =  fee.createTransaction();
+                        //System.out.println("t "+valid1 +"   -  fee "+valid2);
+                        valid = valid1 &&valid2;
                     }
                     if(!valid || minMoney<(float)(Float.parseFloat(m)*1.03))
                     {
@@ -455,8 +459,11 @@ public class ATMInterface extends JFrame {
                     Transaction t = null;
                     float minMoney = 0;
                      try{
-                     fee = new Transaction(date,(float)(Float.parseFloat(m)*0.02), 10,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
+                        float val = (float)(Float.parseFloat(m)*0.02);
+                     fee = new Transaction(date,val, 10,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
+                    
                         t = new Transaction(date,Float.parseFloat(m), 7,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));   
+                        t.createID();
                      minMoney = (float)(new Account(Integer.parseInt(fromAcct))).getMoney();
                    
                     }catch(NumberFormatException ex){
@@ -466,12 +473,16 @@ public class ATMInterface extends JFrame {
                     boolean valid = false;
 
                     if(t!=null && fee!=null) {
-                        valid  = t.createTransaction()
-                            && fee.createTransaction();
+                       boolean  valid1 = t.createTransaction();
+                       fee.createID();
+                        boolean valid2 =  fee.createTransaction();
+                        System.out.println("t "+valid1 +"   -  fee "+valid2);
+                        valid = valid1 &&valid2;
                     }
                    
                     if(!valid || minMoney<(float)(Float.parseFloat(m)*1.02)) {
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Operation.");
+                        System.out.println("invalid!! "+ valid);
                     }
                     else {
                         JOptionPane.showMessageDialog(null, "SUCCESS");
