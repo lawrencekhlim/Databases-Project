@@ -117,6 +117,7 @@ public class Transaction {
     public boolean createTransaction () {
         //createID();
         Account decrAccount = null;
+        Account incrAccount = null;
         if (decrAcctID != -1) {
             decrAccount = new Account (decrAcctID);
             if(decrAccount.getMoney()<moneyTrans) {
@@ -124,12 +125,25 @@ public class Transaction {
                 return false;
             }
             else if(decrAccount.getMoney()-moneyTrans<.01) {
-                System.out.println("NEGATIVE BALANCE");
+                //System.out.println("NEGATIVE BALANCE");
                 decrAccount.setDeleteDate(current);
+                return false;
+
             }
 
         }
         
+        if(decrAcctID!=-1 || incrAcctID!=-1)
+        {
+            decrAccount = new Account (decrAcctID);
+            incrAccount = new Account(incrAcctID);
+
+
+            if(decrAccount.getDeleteDate() != null || incrAccount.getDeleteDate()!=null)
+            {
+                return false;
+            }
+        }
         String query = "INSERT INTO Transaction (transaction_id, transDate, moneyTrans, transType, incrAcctID, decrAcctID) VALUES (?, ?, ?, ?, ?, ?)";
         
         DatabaseHelper.getInstance().openConnection();
@@ -162,7 +176,6 @@ public class Transaction {
         }
         
         if (incrAcctID != -1) {
-            Account incrAccount = new Account (incrAcctID);
             incrAccount.setMoney (incrAccount.getMoney() + moneyTrans);
         }
         

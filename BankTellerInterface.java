@@ -727,9 +727,39 @@ public class BankTellerInterface extends JFrame {
         genDTERButton.addActionListener (new ActionListener () {
             public void actionPerformed (ActionEvent e) {
                 // TODO Generate DTER
-                String query = "SELECT * FROM Customer WHERE ";
+                String query1 = " SELECT * FROM (SELECT TID, SUM (moneyVal) AS SumInc FROM (SELECT TID , moneyVal FROM Transaction T, Customer C, Account A WHERE C.TID = A.primOwner AND A.account_id = T.incrAcctID AND (T.transType= 0 OR  T.transType = 4  OR T.transType = 7)  UNION SELECT Y.TID, moneyVal FROM Transaction X, CoOwner Y, Account Z WHERE Y.TID = Z.primOwner AND Z.account_id = X.incrAcctID AND (X.transType= 0 OR  X.transType = 4 OR X.transType = 7) ) GROUP BY TID) WHERE SumInc > 10000";
+                ArrayList<Integer> idsNames = new ArrayList<>();
+                int acctID = 0;
+                //get last date
+                DatabaseHelper.getInstance().openConnection();
+                 try {
+                    ResultSet rs = DatabaseHelper.getInstance ().executeQuery(query1);
+                    //flag = false; // isNotEmpty
+                    while (rs.next()) {
+                        acctID = rs.getInt ("TID");
+                        System.out.println("TID rich boiz "+acctID);
+                        idsNames.add(acctID);
+                        //flag = true;
+                    }
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "ERROR");
+                    idleView();
+                    return;
+                }
+                DatabaseHelper.getInstance().closeConnection();
+                //JOptionPane.showMessageDialog(null, "DTER\nA\nB");
+                String output = "Drug and Tax Evasion Report" + ":\n";
+                for(int i =0; i< idsNames.size(); i++)
+                {
+                    int id = idsNames.get(i);
+                    Customer a = new Customer(id);
+                    output += "Account ID  "+ id + "  Name " + a.getName() +"\n";
+
+                }
                 
-                JOptionPane.showMessageDialog(null, "DTER\nA\nB");
+                JOptionPane.showMessageDialog(null, output);
             }
         });
 
