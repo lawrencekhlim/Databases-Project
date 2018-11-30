@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Date;
+import java.sql.*;
 //transaction types
 //0 - deposit
 //1 - top up
@@ -16,12 +17,16 @@ import java.util.Date;
 //9 - accrue interest
 //10 - fees
 
-public class ATMInterface extends JFrame implements ActionListener {
+public class ATMInterface extends JFrame {
+    java.sql.Date current = new java.sql.Date (java.lang.System.currentTimeMillis());
+    
     JPanel gridButtons;
     JPanel userInterface;
     JPanel idlePanel;
     JPanel singleAccountTrans;
     JPanel twoAccountTrans;
+    JPanel setDatePanel;
+    JPanel changeInterestRatePanel;
     
     JButton depositButton;
     JButton topUpButton;
@@ -31,7 +36,13 @@ public class ATMInterface extends JFrame implements ActionListener {
     JButton collectButton;
     JButton wireButton;
     JButton payButton;
+    JButton setDateButton;
+    JButton changeInterestButton;
     Customer loggedCust = null;
+    
+    JTextField setDateTextField5;
+    JTextField accountTypeTextField6;
+    JTextField interestRateTextField6;
     
     int actionStatus = 0;
     
@@ -160,7 +171,7 @@ public class ATMInterface extends JFrame implements ActionListener {
                 String acct = comboBox2.getSelectedItem().toString();
                 String m = moneyChanged2.getText();
                    
-                java.sql.Date date = new java.sql.Date( java.lang.System.currentTimeMillis());
+                java.sql.Date date = current;
                 if(actionStatus==2)
                 {
                     //deposit:Add money to the checking or savings account balance.
@@ -195,10 +206,8 @@ public class ATMInterface extends JFrame implements ActionListener {
                 {
 
                     //withdrawl:subtract money to the checking or savings account balance.
-                    if( m==null || acct==null)
-                    {
+                    if( m==null || acct==null) {
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
-                       
                     }
 
                     
@@ -211,15 +220,11 @@ public class ATMInterface extends JFrame implements ActionListener {
                         
                     }
                     boolean valid  = t.createTransaction();
-                    if(!valid)
-                    {
+                    if(!valid) {
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Operation.");
-                        
                     }
-                    else
-                    {
+                    else {
                         JOptionPane.showMessageDialog(null, "SUCCESS");
-                          
                     }
                 }
                 else if(actionStatus==5)
@@ -312,7 +317,7 @@ public class ATMInterface extends JFrame implements ActionListener {
                     String toAcct = sendToDropDown.getSelectedItem().toString();
                     String m = moneyChanged3.getText();
                    
-                    java.sql.Date date = new java.sql.Date( java.lang.System.currentTimeMillis());
+                    java.sql.Date date = current;
 
                     if(fromAcct==null || m==null || toAcct==null)
                     {
@@ -353,7 +358,7 @@ public class ATMInterface extends JFrame implements ActionListener {
                     String toAcct = sendToDropDown.getSelectedItem().toString();
                     String m = moneyChanged3.getText();
                    
-                    java.sql.Date date = new java.sql.Date( java.lang.System.currentTimeMillis());
+                    java.sql.Date date = current;
 
                     if(fromAcct==null || m==null || toAcct==null)
                     {
@@ -393,7 +398,7 @@ public class ATMInterface extends JFrame implements ActionListener {
                     String toAcct = sendToDropDown.getSelectedItem().toString();
                     String m = moneyChanged3.getText();
 
-                    java.sql.Date date = new java.sql.Date( java.lang.System.currentTimeMillis());
+                    java.sql.Date date = current;
                     if(fromAcct==null || m==null || toAcct==null)
                     {
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
@@ -439,10 +444,9 @@ public class ATMInterface extends JFrame implements ActionListener {
                     String toAcct = sendToDropDown.getSelectedItem().toString();
                     String m = moneyChanged3.getText();
                    
-                    java.sql.Date date = new java.sql.Date( java.lang.System.currentTimeMillis());
+                    java.sql.Date date = current;
 
-                    if(fromAcct==null || m==null || toAcct==null)
-                    {
+                    if(fromAcct==null || m==null || toAcct==null) {
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
                         
                     } 
@@ -461,20 +465,16 @@ public class ATMInterface extends JFrame implements ActionListener {
                     }
                     boolean valid = false;
 
-                    if(t!=null && fee!=null)
-                    {
-                        valid  = t.createTransaction() && fee.createTransaction();
+                    if(t!=null && fee!=null) {
+                        valid  = t.createTransaction()
+                            && fee.createTransaction();
                     }
                    
-                    if(!valid || minMoney<(float)(Float.parseFloat(m)*1.02))
-                    {
+                    if(!valid || minMoney<(float)(Float.parseFloat(m)*1.02)) {
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Operation.");
-                        
                     }
-                    else
-                    {
+                    else {
                         JOptionPane.showMessageDialog(null, "SUCCESS");
-                          
                     }
 
 
@@ -486,7 +486,7 @@ public class ATMInterface extends JFrame implements ActionListener {
                     String toAcct = sendToField3.getText();
                     String m = moneyChanged3.getText();
 
-                    java.sql.Date date = new java.sql.Date( java.lang.System.currentTimeMillis());
+                    java.sql.Date date = current;
 
                     if(fromAcct==null || m==null || toAcct==null)
                     {
@@ -504,21 +504,14 @@ public class ATMInterface extends JFrame implements ActionListener {
 
                    
                     boolean valid  = t.createTransaction();
-                    if(!valid)
-                    {
+                    if(!valid) {
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Operation.");
-                      
                     }
-                    else
-                    {
+                    else {
                         JOptionPane.showMessageDialog(null, "SUCCESS");
-                         
                     }
-
-
                 }
-                else
-                {
+                else {
                     JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
                 }
                 idleView();
@@ -540,6 +533,127 @@ public class ATMInterface extends JFrame implements ActionListener {
         
         // End twoAccountTrans-----------------------------------------------------------------------------------------
         
+        //setDatePanel --------------------------------------------
+        
+        setDatePanel = new JPanel();
+        setDatePanel.setLayout(new FlowLayout());
+        
+        JButton cancel5 = new JButton ("Cancel");
+        cancel5.addActionListener ( new ActionListener (){
+            public void actionPerformed (ActionEvent e) {
+                idleView();
+            }
+        });
+        
+        JLabel setDateLabel5 = new JLabel();
+        setDateLabel5.setText("Date Format MM-DD-YYYY: ");
+        setDateTextField5 = new JTextField();
+        setDateTextField5.setPreferredSize(new Dimension(150,25));
+        
+        JButton submit5 = new JButton ("Change");
+        submit5.addActionListener ( new ActionListener () {
+            public void actionPerformed (ActionEvent ae) {
+                boolean success = true;
+                try {
+                    java.text.DateFormat df = new java.text.SimpleDateFormat("MM-dd-yyyy");
+                    current = new java.sql.Date(df.parse(setDateTextField5.getText()).getTime());
+                } catch (Exception e) {
+                    success = false;
+                }
+                
+                if (success) {
+                    JOptionPane.showMessageDialog(null, "Changed date to " + current.toString());
+                }  else
+                    JOptionPane.showMessageDialog(null, "Unable to change date to \"" + setDateTextField5.getText() +"\"");
+                
+                
+                idleView();
+            }
+        });
+        
+        setDatePanel.add (cancel5);
+        setDatePanel.add (setDateLabel5);
+        setDatePanel.add (setDateTextField5);
+        setDatePanel.add (submit5);
+        
+        //setDatePanel-----------------------------------------
+        
+        
+        //changeInterestRatePanel --------------------------------------------
+        
+        changeInterestRatePanel = new JPanel();
+        changeInterestRatePanel.setLayout(new FlowLayout());
+        
+        JButton cancel6 = new JButton ("Cancel");
+        cancel6.addActionListener ( new ActionListener (){
+            public void actionPerformed (ActionEvent e) {
+                idleView();
+            }
+        });
+        
+        JLabel setAccountTypeLabel6 = new JLabel();
+        setAccountTypeLabel6.setText("Account Type: ");
+        accountTypeTextField6 = new JTextField();
+        accountTypeTextField6.setPreferredSize(new Dimension(150,25));
+        
+        JLabel setInterestRateLabel6 = new JLabel();
+        setInterestRateLabel6.setText("Interest Rate: ");
+        interestRateTextField6 = new JTextField();
+        interestRateTextField6.setPreferredSize(new Dimension(150,25));
+        
+        
+        JButton submit6 = new JButton ("Change");
+        submit6.addActionListener ( new ActionListener () {
+            public void actionPerformed (ActionEvent ae) {
+                int acctType = -1;
+                if (accountTypeTextField6.getText().equals ("0") || accountTypeTextField6.getText().equals ("InterestChecking")) {
+                    acctType = 0;
+                } else if (accountTypeTextField6.getText().equals ("1") || accountTypeTextField6.getText().equals ("StudentChecking")) {
+                    acctType = 1;
+                } else if (accountTypeTextField6.getText().equals ("2") || accountTypeTextField6.getText().equals ("Savings")) {
+                    acctType = 2;
+                } else if (accountTypeTextField6.getText().equals ("3") || accountTypeTextField6.getText().equals ("Pocket")) {
+                    acctType = 3;
+                } else {
+                    JOptionPane.showMessageDialog(null, "Account Type Input Not Recognized \"" + accountTypeTextField6.getText() + "\"");
+                }
+                
+                if (acctType != -1) {
+                    DatabaseHelper.getInstance().openConnection();
+                    boolean success = true;
+                    try {
+                        
+                        System.out.println  (Float.parseFloat (interestRateTextField6.getText()));
+                        //String updateQuery = "UPDATE Account SET annualRate="+Float.parseFloat (interestRateTextField6.getText()) + " WHERE account_type=" + acctType;
+                        String updateQuery = "UPDATE Account SET annualRate=? WHERE account_type=?";
+                        PreparedStatement stmt = DatabaseHelper.getInstance().createAction (updateQuery);
+                        stmt.setFloat (1, Float.parseFloat (interestRateTextField6.getText()));
+                        stmt.setInt (2, acctType);
+                        stmt.execute();
+                    } catch (Exception e) {
+                        success = false;
+                    }
+                    
+                    DatabaseHelper.getInstance().closeConnection();
+                    
+                    if (success) {
+                        JOptionPane.showMessageDialog(null, "Update Success");
+                    }  else
+                        JOptionPane.showMessageDialog(null, "Update Failed");
+                }
+                idleView();
+            }
+        });
+        
+        changeInterestRatePanel.add (cancel6);
+        changeInterestRatePanel.add (setAccountTypeLabel6);
+        changeInterestRatePanel.add (accountTypeTextField6);
+        changeInterestRatePanel.add (setInterestRateLabel6);
+        changeInterestRatePanel.add (interestRateTextField6);
+        changeInterestRatePanel.add (submit6);
+        
+        //changeInterestRatePanel-----------------------------------------
+        
         
         // Beginning CardLayout
         
@@ -550,6 +664,8 @@ public class ATMInterface extends JFrame implements ActionListener {
         userInterface.add (idlePanel, "idleState");
         userInterface.add (singleAccountTrans, "singleAccountTrans");
         userInterface.add (twoAccountTrans, "twoAccountTrans");
+        userInterface.add (setDatePanel, "setDatePanel");
+        userInterface.add (changeInterestRatePanel, "changeInterestRatePanel");
         
         ((CardLayout)userInterface.getLayout()).show (userInterface, "login");
         // End CardLayout
@@ -734,7 +850,7 @@ public class ATMInterface extends JFrame implements ActionListener {
                 sendToDropDown.setVisible(true);
 
 
-                 ArrayList<Account> allCheckingSavingAccts  = new ArrayList<>();
+                ArrayList<Account> allCheckingSavingAccts  = new ArrayList<>();
                 allCheckingSavingAccts.addAll(loggedCust.getAccountOfType(0));
                 allCheckingSavingAccts.addAll(loggedCust.getAccountOfType(1));
                 allCheckingSavingAccts.addAll(loggedCust.getAccountOfType(2));
@@ -816,6 +932,28 @@ public class ATMInterface extends JFrame implements ActionListener {
 
             }
         });
+        
+        setDateButton = new JButton();
+        setDateButton.setText("Debug: Set Date");
+        gridButtons.add(setDateButton);
+        setDateButton.addActionListener(new ActionListener () {
+            public void actionPerformed (ActionEvent e) {
+                ((CardLayout)userInterface.getLayout()).show (userInterface, "setDatePanel");
+                setGridButtonsVisible (false);
+                setDateButton.setVisible (true);
+            }
+        });
+        
+        changeInterestButton = new JButton ();
+        changeInterestButton.setText("Debug: Change Interest");
+        gridButtons.add(changeInterestButton);
+        changeInterestButton.addActionListener(new ActionListener () {
+            public void actionPerformed (ActionEvent e) {
+                ((CardLayout)userInterface.getLayout()).show (userInterface, "changeInterestRatePanel");
+                setGridButtonsVisible (false);
+                changeInterestButton.setVisible (true);
+            }
+        });
 
         // End gridButtons
 
@@ -848,6 +986,8 @@ public class ATMInterface extends JFrame implements ActionListener {
         collectButton.setVisible (visible);
         wireButton.setVisible (visible);
         payButton.setVisible (visible);
+        setDateButton.setVisible (visible);
+        changeInterestButton.setVisible (visible);
     }
     
     public void idleView () {
@@ -856,8 +996,6 @@ public class ATMInterface extends JFrame implements ActionListener {
         setGridButtonsVisible(true);
     }
     
-    public void actionPerformed(ActionEvent e){
-        System.out.println("Oui!");}
 
     public static void main(String[] args) {
         ATMInterface ex = new ATMInterface();
