@@ -16,6 +16,8 @@ public class BankTellerInterface extends JFrame {
     JPanel createAcctPanel;
     JPanel delTransPanel;
     JPanel customerIDPanel;
+    JPanel setDatePanel;
+    JPanel changeInterestRatePanel;
     
     JButton checkTransButton;
     JButton genMSButton;
@@ -26,6 +28,8 @@ public class BankTellerInterface extends JFrame {
     JButton createAcctButton;
     JButton delAcctButton;
     JButton delTransButton;
+    JButton setDateButton;
+    JButton changeInterestButton;
     
     JTextField accountNumberTextField1;
     JTextField enterCheckTextField1;
@@ -34,6 +38,13 @@ public class BankTellerInterface extends JFrame {
     JTextField transactionTextField3;
     
     JTextField customerTIDTextField4;
+    
+    JTextField setDateTextField5;
+    
+    JTextField accountTypeTextField6;
+    JTextField interestRateTextField6;
+    
+    
     int customerActionStatus = 0;
 
 	public BankTellerInterface() {
@@ -100,7 +111,7 @@ public class BankTellerInterface extends JFrame {
                 try { //Try to make the input into an integer
                     TID = Integer.parseInt(accountNumberTextField1.getText());
                     float increase = Float.parseFloat(enterCheckTextField1.getText());
-                    Transaction trans = new Transaction (new java.sql.Date(java.lang.System.currentTimeMillis()), increase, 0, TID, -1);
+                    Transaction trans = new Transaction (current, increase, 0, TID, -1);
                     success = trans.createTransaction();
                 }
                 catch(Exception e) {
@@ -228,8 +239,28 @@ public class BankTellerInterface extends JFrame {
                     // TODO Generate Monthly Statement
                     ArrayList <Account> accounts = c.getAccounts ();
                     String output = "Monthly Statement\n";
-                    
-
+                    for (Account account: accounts) {
+                        ArrayList<Customer> customers = account.getAccountOwners ();
+                        output+= "Account ID  " +account.getAccountID() +"\n";
+                        for (Customer customer: customers) {
+                            output+="Owner:  " + customer.getName()+ "  Address:  " + customer.getAddress() +"\n";
+                        }
+                        ArrayList <Transaction> transactions = account.getTransactions ();
+                        double accountBalance = account.getMoney();
+                        long day30 = 31l * 24 * 60 * 60 * 1000;
+                        for (Transaction transaction: transactions) {
+                            if (transaction.getTransactionDate().after(new Date(current.getTime() - day30))) {
+                                output+="Transaction ID:  " + transaction.getTransactionID()+ "  Date:  " + transaction.getTransactionDate() +"\n";
+                                if (transaction.getAccountIncreased() == account.getAccountID()) {
+                                    accountBalance -= transaction.getMoneyTransferred();
+                                }
+                                if (transaction.getAccountDecreased() == account.getAccountID()) {
+                                    accountBalance += transaction.getMoneyTransferred();
+                                }
+                            }
+                        }
+                        output += "Initial Balance :  " + accountBalance + "  Final Balance:  " + account.getMoney() +"\n\n";
+                    }
                     JOptionPane.showMessageDialog(null, output);
                     
                 } else if (!fail && customerActionStatus == 1) {
@@ -268,6 +299,132 @@ public class BankTellerInterface extends JFrame {
         // End Customer ID Panel
 
 
+        //setDatePanel --------------------------------------------
+        
+        setDatePanel = new JPanel();
+        setDatePanel.setLayout(new FlowLayout());
+        
+        JButton cancel5 = new JButton ("Cancel");
+        cancel5.addActionListener ( new ActionListener (){
+            public void actionPerformed (ActionEvent e) {
+                idleView();
+            }
+        });
+        
+        JLabel setDateLabel5 = new JLabel();
+        setDateLabel5.setText("Date Format MM-DD-YYYY: ");
+        setDateTextField5 = new JTextField();
+        setDateTextField5.setPreferredSize(new Dimension(150,25));
+        
+        JButton submit5 = new JButton ("Change");
+        submit5.addActionListener ( new ActionListener () {
+            public void actionPerformed (ActionEvent ae) {
+                boolean success = true;
+                try {
+                    java.text.DateFormat df = new java.text.SimpleDateFormat("MM-dd-yyyy");
+                    current = new java.sql.Date(df.parse(setDateTextField5.getText()).getTime());
+                } catch (Exception e) {
+                    success = false;
+                }
+                
+                if (success) {
+                    JOptionPane.showMessageDialog(null, "Changed date to " + current.toString());
+                }  else
+                    JOptionPane.showMessageDialog(null, "Unable to change date to \"" + setDateTextField5.getText() +"\"");
+                    
+                
+                idleView();
+            }
+        });
+        
+        setDatePanel.add (cancel5);
+        setDatePanel.add (setDateLabel5);
+        setDatePanel.add (setDateTextField5);
+        setDatePanel.add (submit5);
+        
+        //setDatePanel-----------------------------------------
+        
+        
+        //changeInterestRatePanel --------------------------------------------
+        
+        changeInterestRatePanel = new JPanel();
+        changeInterestRatePanel.setLayout(new FlowLayout());
+        
+        JButton cancel6 = new JButton ("Cancel");
+        cancel6.addActionListener ( new ActionListener (){
+            public void actionPerformed (ActionEvent e) {
+                idleView();
+            }
+        });
+        
+        JLabel setAccountTypeLabel6 = new JLabel();
+        setAccountTypeLabel6.setText("Account Type: ");
+        accountTypeTextField6 = new JTextField();
+        accountTypeTextField6.setPreferredSize(new Dimension(150,25));
+        
+        JLabel setInterestRateLabel6 = new JLabel();
+        setInterestRateLabel6.setText("Interest Rate: ");
+        interestRateTextField6 = new JTextField();
+        interestRateTextField6.setPreferredSize(new Dimension(150,25));
+        
+        
+        JButton submit6 = new JButton ("Change");
+        submit6.addActionListener ( new ActionListener () {
+            public void actionPerformed (ActionEvent ae) {
+                int acctType = -1;
+                if (accountTypeTextField6.getText().equals ("0") || accountTypeTextField6.getText().equals ("InterestChecking")) {
+                    acctType = 0;
+                } else if (accountTypeTextField6.getText().equals ("1") || accountTypeTextField6.getText().equals ("StudentChecking")) {
+                    acctType = 1;
+                } else if (accountTypeTextField6.getText().equals ("2") || accountTypeTextField6.getText().equals ("Savings")) {
+                    acctType = 2;
+                } else if (accountTypeTextField6.getText().equals ("3") || accountTypeTextField6.getText().equals ("Pocket")) {
+                    acctType = 3;
+                } else {
+                    JOptionPane.showMessageDialog(null, "Account Type Input Not Recognized \"" + accountTypeTextField6.getText() + "\"");
+                }
+                
+                if (acctType != -1) {
+                    DatabaseHelper.getInstance().openConnection();
+                    boolean success = true;
+                    try {
+                        
+                        System.out.println  (Float.parseFloat (interestRateTextField6.getText()));
+                        //String updateQuery = "UPDATE Account SET annualRate="+Float.parseFloat (interestRateTextField6.getText()) + " WHERE account_type=" + acctType;
+                        String updateQuery = "UPDATE Account SET annualRate=? WHERE account_type=?";
+                        PreparedStatement stmt = DatabaseHelper.getInstance().createAction (updateQuery);
+                        stmt.setFloat (1, Float.parseFloat (interestRateTextField6.getText()));
+                        stmt.setInt (2, acctType);
+                        System.out.println ("Here");
+                        stmt.execute();
+                        
+                        System.out.println ("Here1");
+                    } catch (Exception e) {
+                        success = false;
+                    }
+                    System.out.println ("Here2");
+                    
+                    DatabaseHelper.getInstance().closeConnection();
+                    
+                    if (success) {
+                        JOptionPane.showMessageDialog(null, "Update Success");
+                    }  else
+                        JOptionPane.showMessageDialog(null, "Update Failed");
+                }
+                idleView();
+            }
+        });
+        
+        changeInterestRatePanel.add (cancel6);
+        changeInterestRatePanel.add (setAccountTypeLabel6);
+        changeInterestRatePanel.add (accountTypeTextField6);
+        changeInterestRatePanel.add (setInterestRateLabel6);
+        changeInterestRatePanel.add (interestRateTextField6);
+        changeInterestRatePanel.add (submit6);
+        
+        //changeInterestRatePanel-----------------------------------------
+        
+        
 
         // Beginning CardLayout-----------------------------------------------------------
         
@@ -279,6 +436,8 @@ public class BankTellerInterface extends JFrame {
         userInterface.add (createAcctPanel, "createAcctPanel");
         userInterface.add (delTransPanel, "delTransPanel");
         userInterface.add (customerIDPanel, "customerIDPanel");
+        userInterface.add (setDatePanel, "setDatePanel");
+        userInterface.add (changeInterestRatePanel, "changeInterestRatePanel");
 
         
         ((CardLayout)userInterface.getLayout()).show (userInterface, "idleState");
@@ -288,7 +447,7 @@ public class BankTellerInterface extends JFrame {
 
         // Beginning GridButton-----------------------------------------------------------
         JPanel gridButtons = new JPanel();
-        gridButtons.setLayout(new GridLayout(3,3));
+        gridButtons.setLayout(new GridLayout(4,3));
         gridButtons.setVisible(true);
 
 
@@ -567,6 +726,30 @@ public class BankTellerInterface extends JFrame {
             }
            
         });
+        
+        setDateButton = new JButton();
+        setDateButton.setText("Debug: Set Date");
+        gridButtons.add(setDateButton);
+        setDateButton.addActionListener(new ActionListener () {
+            public void actionPerformed (ActionEvent e) {
+                ((CardLayout)userInterface.getLayout()).show (userInterface, "setDatePanel");
+                setGridButtonsVisible (false);
+                setDateButton.setVisible (true);
+            }
+        });
+        
+        changeInterestButton = new JButton ();
+        changeInterestButton.setText("Debug: Change Interest");
+        gridButtons.add(changeInterestButton);
+        changeInterestButton.addActionListener(new ActionListener () {
+            public void actionPerformed (ActionEvent e) {
+                ((CardLayout)userInterface.getLayout()).show (userInterface, "changeInterestRatePanel");
+                setGridButtonsVisible (false);
+                changeInterestButton.setVisible (true);
+            }
+        });
+        
+        
         //end grid buttons
 
         getContentPane().add(title);
@@ -588,6 +771,8 @@ public class BankTellerInterface extends JFrame {
         createAcctButton.setVisible (visible);
         delAcctButton.setVisible (visible);
         delTransButton.setVisible (visible);
+        setDateButton.setVisible (visible);
+        changeInterestButton .setVisible(visible);
     }
     
     public void idleView () {

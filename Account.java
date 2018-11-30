@@ -1,6 +1,7 @@
 //import java.sql.Date;
 import java.sql.*;
 import java.util.Date;
+import java.util.ArrayList;
 //checking mums
 //0 - interest checking
 //1 -  student checking
@@ -104,6 +105,54 @@ public class Account {
         DatabaseHelper.getInstance().closeConnection();
         
     }
+    
+    public ArrayList <Transaction> getTransactions () {
+        DatabaseHelper.getInstance().openConnection();
+        String query = "SELECT * FROM Account A, Transaction T WHERE (A.account_id=T.incrAcctID OR A.account_id=T.decrAcctID) AND A.account_id="+accountID;
+        
+        ResultSet stmt = DatabaseHelper.getInstance ().executeQuery (query);
+        ArrayList <Transaction> ret = new ArrayList <Transaction> ();
+        try {
+            while (stmt.next()) {
+                int incrAcctID = stmt.getInt ("incrAcctID");
+                if (stmt.wasNull())
+                    incrAcctID = -1;
+                int decrAcctID = stmt.getInt ("decrAcctID");
+                if (stmt.wasNull())
+                    decrAcctID = -1;
+                
+                ret.add (new Transaction (stmt.getInt ("transaction_id"), stmt.getDate ("transDate"), stmt.getFloat ("moneyTrans"), stmt.getInt("transType"), incrAcctID, decrAcctID));
+            }
+        } catch (Exception e) {
+            
+        }
+        DatabaseHelper.getInstance().closeConnection();
+        return ret;
+    }
+    
+    public ArrayList <Customer> getAccountOwners () {
+        DatabaseHelper.getInstance().openConnection();
+        String query = "SELECT C.TID, C.name, C.address, C.PIN FROM Account A, Customer C WHERE A.primOwner=C.TID AND A.account_id="+accountID + " UNION SELECT Y.TID, Y.name, Y.address, Y.PIN FROM Customer Y, CoOwner Z WHERE Y.TID=Z.TID AND Z.account_id=" +accountID;
+        
+        ResultSet stmt = DatabaseHelper.getInstance ().executeQuery (query);
+        ArrayList <Customer> ret = new ArrayList <Customer> ();
+        try {
+            while (stmt.next()) {
+                String name = stmt.getString ("name");
+                if (stmt.wasNull())
+                    name = "";
+                String address = stmt.getString ("address");
+                if (stmt.wasNull())
+                    address = "";
+                
+                ret.add (new Customer (stmt.getInt ("TID"), name, address, stmt.getInt ("PIN") ));
+            }
+        } catch (Exception e) {
+            
+        }
+        DatabaseHelper.getInstance().closeConnection();
+        return ret;
+    }
 
 	public int getAccountID(){
 		return accountID;
@@ -130,36 +179,37 @@ public class Account {
 
 
 	public void setMoney(double m){
-		  DatabaseHelper.getInstance().openConnection();
-          String updateQuery = "UPDATE Account SET moneyVal=? WHERE account_id=?";
-          PreparedStatement stmt = DatabaseHelper.getInstance ().createAction (updateQuery);
-          this.money = m;
-          try {
-                stmt.setDouble(1, m);
-                stmt.setInt(2, accountID);
-                stmt.execute();
-          } catch (Exception e) {
-                e.printStackTrace();
-             
-           }
-           DatabaseHelper.getInstance().closeConnection();
-
+        DatabaseHelper.getInstance().openConnection();
+        String updateQuery = "UPDATE Account SET moneyVal=? WHERE account_id=?";
+        PreparedStatement stmt = DatabaseHelper.getInstance ().createAction(updateQuery);
+        
+        this.money = m;
+        try {
+            stmt.setDouble(1, m);
+            stmt.setInt(2, accountID);
+            stmt.execute();
+        }catch (Exception e) {
+            e.printStackTrace();
+            
+        }
+        DatabaseHelper.getInstance().closeConnection();
 	}
 
 	public void setDeleteDate(java.sql.Date d){
-		  DatabaseHelper.getInstance().openConnection();
-          String updateQuery = "UPDATE Account SET deletedDate=? WHERE account_id=?";
-          PreparedStatement stmt = DatabaseHelper.getInstance ().createAction (updateQuery);
-          this.deleteDate = d;
-          try {
-                stmt.setDate(1, d);
-                stmt.setInt(2, accountID);
-                stmt.execute();
-          } catch (Exception e) {
-                e.printStackTrace();
+        DatabaseHelper.getInstance().openConnection();
+        String updateQuery = "UPDATE Account SET deletedDate=? WHERE account_id=?";
+        PreparedStatement stmt = DatabaseHelper.getInstance ().createAction(updateQuery);
+        
+        this.deleteDate = d;
+        try {
+            stmt.setDate(1, d);
+            stmt.setInt(2, accountID);
+            stmt.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
              
-           }
-           DatabaseHelper.getInstance().closeConnection();
+        }
+        DatabaseHelper.getInstance().closeConnection();
 
 	}
 
@@ -214,7 +264,7 @@ public class Account {
         Account test2 = new Account(testA);
         System.out.println(test2.getMoney());
         test2.setMoney(150.0);
-         date = new java.sql.Date(df.parse("03-04-2015").getTime());
+         date = new java.sql.Date(df.parse("11-04-2018").getTime());
 
         test2.setDeleteDate(date);
         Account test3 = new Account(test2.getAccountID());
