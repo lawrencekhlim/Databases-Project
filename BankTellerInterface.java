@@ -53,6 +53,7 @@ public class BankTellerInterface extends JFrame {
     JTextField enterAccountTypeTextField8;
     JTextField enterMoneyTextField8;
     JTextField enterCoOwnersTextField8;
+    JTextField linkedAccountTextField8;
     
     int customerActionStatus = 0;
 
@@ -263,7 +264,7 @@ public class BankTellerInterface extends JFrame {
         
         
          createAccountSettingsPanel = new JPanel();
-        /*
+         /*
          createAccountSettingsPanel.setLayout(new FlowLayout());
          JButton cancel8 = new JButton ("Cancel");
          cancel8.addActionListener ( new ActionListener (){
@@ -279,7 +280,7 @@ public class BankTellerInterface extends JFrame {
         enterAccountTypeTextField8.setPreferredSize(new Dimension(150,25));
         
         JLabel moneyLabel8  = new JLabel();
-        moneyLabel8.setText("$");
+        moneyLabel8.setText("(Non Pocket Account Only) $");
         enterMoneyTextField8 = new JTextField();
         enterMoneyTextField8.setPreferredSize(new Dimension(150,25));
         
@@ -288,6 +289,11 @@ public class BankTellerInterface extends JFrame {
         coOwnersLabel8.setText("CoOwner TIDs (Must Be Existing): ");
         enterCoOwnersTextField8 = new JTextField();
         enterCoOwnersTextField8.setPreferredSize(new Dimension(150,25));
+        
+        JLabel linkedAccountLabel8 = new JLabel();
+        linkedAccountLabel8.setText("Link Account ID (Only for Pocket Accounts): ");
+        linkedAccountTextField8 = new JTextField();
+        linkedAccountTextField8.setPreferredSize(new Dimension(150,25));
         
         JButton submit8 = new JButton ("Submit");
         submit8.addActionListener ( new ActionListener () {
@@ -309,8 +315,62 @@ public class BankTellerInterface extends JFrame {
                 } else {
                     JOptionPane.showMessageDialog(null, "Account Type Input Not Recognized \"" + text + "\"");
                 }
-                
-                if (acctType != -1) {
+                Account a = null;
+                if (acctType == 3) {
+                    boolean createdAccount = true;
+                    try {
+                        a = new Account (acctType, 0, null, interest_rate, Integer.parseInt (enterCustomerTextField2.getText()), false);
+                        createdAccount = a.createAccount (current);
+                    } catch (Exception e) {
+                        createdAccount = false;
+                        return;
+                    }
+                    if (createdAccount) {
+                        JOptionPane.showMessageDialog(null, "Create Account Success");
+                    }
+                    else {
+                        JOptionPane.showMessageDialog(null, "Create Account Failed");
+                        idleView();
+                        return;
+                    }
+                    
+                    boolean linkedAccountSuccess = true;
+                    try {
+                        linkedAccountSuccess = a.createLinkedAccount(Integer.parseInt (linkedAccountTextField8.getText()));
+                    } catch (Exception e) {
+                        linkedAccountSuccess = false;
+                    }
+                    
+                    if (linkedAccountSuccess) {
+                        JOptionPane.showMessageDialog(null, "Linked Account Success");
+                        JOptionPane.showMessageDialog(null, "No Money was Transferred to New Account");
+                    }
+                    else {
+                        JOptionPane.showMessageDialog(null, "Link Account Failed");
+                        
+                        DatabaseHelper.getInstance().openConnection();
+                        String query = "DELETE FROM Account A WHERE A.account_id=?";
+                        PreparedStatement stmt = DatabaseHelper.getInstance().createAction (query);
+                        
+                        boolean deleteSuccess = true;
+                        try {
+                            stmt.setInt (1, a.getAccountID());
+                            stmt.execute();
+                        } catch (Exception e) {
+                            deleteSuccess = false;
+                        }
+                        
+                        if (deleteSuccess) {
+                            JOptionPane.showMessageDialog(null, "Deleted Unlinked Account");
+                        }
+                        else {
+                            JOptionPane.showMessageDialog(null, "Failed Delete Unlinked Account");
+                        }
+                        idleView();
+                        return;
+                    }
+                }
+                else if (acctType != -1) {
                     double money = 0;
                     try {
                         money = Double.parseDouble (enterMoneyTextField8.getText());
@@ -319,17 +379,25 @@ public class BankTellerInterface extends JFrame {
                         idleView();
                         return;
                     }
-                    
-                    Account a;
+                    boolean createdAccount = true;
                     try {
-                        a = new Account (acctType, money, null, interest_rate, Integer.parseInt (enterCustomerTextField2.getText()));
+                        a = new Account (acctType, money, null, interest_rate, Integer.parseInt (enterCustomerTextField2.getText()), false);
+                        createdAccount = a.createAccount (current);
                     } catch (Exception e) {
+                        createdAccount = false;
+                        return;
+                    }
+                    if (createdAccount) {
+                        JOptionPane.showMessageDialog(null, "Create Account Success");
+                    }
+                    else {
                         JOptionPane.showMessageDialog(null, "Create Account Failed");
                         idleView();
                         return;
                     }
-                    JOptionPane.showMessageDialog(null, "Create Account Success");
-                    
+                }
+                
+                if (acctType != -1) {
                     if (!enterCoOwnersTextField8.getText().equals("")) {
                         String [] arr = enterCoOwnersTextField8.getText().split(",");
                         for (int i = 0; i < arr.length; i++) {
@@ -379,6 +447,8 @@ public class BankTellerInterface extends JFrame {
         createAccountSettingsPanel.add(enterMoneyTextField8);
         createAccountSettingsPanel.add(coOwnersLabel8);
         createAccountSettingsPanel.add(enterCoOwnersTextField8);
+        createAccountSettingsPanel.add(linkedAccountLabel8);
+        createAccountSettingsPanel.add(linkedAccountTextField8);
         createAccountSettingsPanel.add(submit8);
         
         //end create acct panel-----------------------------------------

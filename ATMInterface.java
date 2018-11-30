@@ -72,7 +72,7 @@ public class ATMInterface extends JFrame {
         submitButton.setText("Submit");
         submitButton.addActionListener (new ActionListener () {
             public void actionPerformed (ActionEvent e) {
-                System.out.println("here");
+                //System.out.println("here");
                 //gridButtons.setVisible(true);
                 // ((CardLayout)userInterface.getLayout()).show (userInterface, "idleState");
                 String pinID =  userInput.getText();
@@ -190,15 +190,11 @@ public class ATMInterface extends JFrame {
                        
                     }
                     boolean valid  = t.createTransaction();
-                    if(!valid)
-                    {
+                    if(!valid) {
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Operation.");
-                     
                     }
-                    else
-                    {
+                    else {
                         JOptionPane.showMessageDialog(null, "SUCCESS");
-                          
                     }
 
                 }
@@ -310,8 +306,7 @@ public class ATMInterface extends JFrame {
         confirmButton3.addActionListener(new ActionListener () {
             public void actionPerformed (ActionEvent e) {
                 ((CardLayout)userInterface.getLayout()).show (userInterface, "idleState");
-                if(actionStatus==3)
-                {
+                if(actionStatus==3) {
                     //top up: move money from linked checking/saving into pocket acct
                     String fromAcct = comboBox3.getSelectedItem().toString();
                     String toAcct = sendToDropDown.getSelectedItem().toString();
@@ -319,8 +314,7 @@ public class ATMInterface extends JFrame {
                    
                     java.sql.Date date = current;
 
-                    if(fromAcct==null || m==null || toAcct==null)
-                    {
+                    if(fromAcct==null || m==null || toAcct==null) {
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
                         
                     }
@@ -335,13 +329,11 @@ public class ATMInterface extends JFrame {
 
                     
                     boolean valid  = t.createTransaction();
-                    if(!valid)
-                    {
+                    if(!valid) {
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Operation.");
                         
                     }
-                    else
-                    {
+                    else {
                         JOptionPane.showMessageDialog(null, "SUCCESS");
                          
                     }

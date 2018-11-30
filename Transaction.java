@@ -83,18 +83,10 @@ public class Transaction {
         this.transaction_id = transaction_id;
         this.transDate = transDate;
         this.moneyTrans = moneyTrans;
-    
-        
-        
-        
         
         this.transType = transType;
         this.incrAcctID = incrAcctID;
         this.decrAcctID = decrAcctID;
-    
-    
-    
-    
     
     }
     
@@ -116,21 +108,32 @@ public class Transaction {
     
     public boolean createTransaction () {
         //createID();
+        //System.out.println ("Hello");
         Account decrAccount = null;
         Account incrAccount = null;
         if (decrAcctID != -1) {
             decrAccount = new Account (decrAcctID);
-            if(decrAccount.getMoney()<moneyTrans) {
-                System.out.println("NEGATIVE BALANCE");
+            if(decrAccount.getMoney()<moneyTrans || decrAccount.getDeleteDate() != null) {
+                System.out.println("NEGATIVE BALANCE or closed account");
                 return false;
             }
+
             else if(decrAccount.getMoney()-moneyTrans<.01) {
                 //System.out.println("NEGATIVE BALANCE");
                 decrAccount.setDeleteDate(current);
                 return false;
+            }
+        }
+        
+        //System.out.println ("Hello");
+      
+        if (incrAcctID != -1) {
+            incrAccount = new Account (incrAcctID);
+            if (incrAccount.getDeleteDate() != null) {
+                System.out.println("closed account");
+                return false;
 
             }
-
         }
         
         if(decrAcctID!=-1 || incrAcctID!=-1)
@@ -145,7 +148,7 @@ public class Transaction {
             }
         }
         String query = "INSERT INTO Transaction (transaction_id, transDate, moneyTrans, transType, incrAcctID, decrAcctID) VALUES (?, ?, ?, ?, ?, ?)";
-        
+        System.out.println (query);
         DatabaseHelper.getInstance().openConnection();
         PreparedStatement stmt = DatabaseHelper.getInstance ().createAction (query);
         
@@ -170,18 +173,60 @@ public class Transaction {
             e.printStackTrace();
             return false;
         }
+        DatabaseHelper.getInstance().closeConnection();
         
         if (decrAcctID != -1) {
             decrAccount.setMoney (decrAccount.getMoney() - moneyTrans);
+            if(decrAccount.getMoney() <=.01 && decrAccount.getAccountType() != 3) {
+                //System.out.println("NEGATIVE BALANCE");
+                decrAccount.setDeleteDate(transDate);
+            }
         }
         
+        System.out.println (query);
         if (incrAcctID != -1) {
+
             incrAccount.setMoney (incrAccount.getMoney() + moneyTrans);
         }
-        
-        DatabaseHelper.getInstance().closeConnection();
+        System.out.println (query);
         return true;
         
+    }
+    
+    public boolean createPocketTransaction (java.sql.Date current) {
+        
+        Account decrAccount = null;
+        if (decrAcctID != -1) {
+            decrAccount = new Account (decrAcctID);
+            Date recfee = decrAccount.getRecentFee ();
+            long day30 = 31l * 24 * 60 * 60 * 1000;
+            if (!recfee.after(new Date(current.getTime() - day30))) {
+                return createTransaction ();
+            }
+            else if((recfee.after(new Date(current.getTime() - day30)) && decrAccount.getMoney() >= moneyTrans + 5)) {
+                System.out.println("NEGATIVE BALANCE or closed account");
+                if (createTransaction()) {
+                    Transaction fee = new Transaction (current, 5, 10, -1, decrAcctID);
+                    
+                    DatabaseHelper.getInstance().openConnection();
+                    String query = "UPDATE PocketAccount SET recent_fee=? WHERE account_id=?";
+                    PreparedStatement stmt = DatabaseHelper.getInstance().createAction(query);
+                    try {
+                        stmt.setDate (1, current);
+                        stmt.setInt (2, decrAcctID);
+                        stmt.execute();
+                    } catch (Exception e) {
+                        System.out.println ("FAILED Update FEE Transaction Date");
+                    }
+                    
+                    DatabaseHelper.getInstance().closeConnection();
+                    
+                    return fee.createTransaction();
+                } else
+                    return false;
+            }
+        }
+        return false;
     }
     
     public int getTransactionID () {
