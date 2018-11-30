@@ -18,6 +18,8 @@ public class BankTellerInterface extends JFrame {
     JPanel customerIDPanel;
     JPanel setDatePanel;
     JPanel changeInterestRatePanel;
+    JPanel createCustomerPanel;
+    JPanel createAccountSettingsPanel;
     
     JButton checkTransButton;
     JButton genMSButton;
@@ -44,6 +46,13 @@ public class BankTellerInterface extends JFrame {
     JTextField accountTypeTextField6;
     JTextField interestRateTextField6;
     
+    JTextField enterCustomerNameTextField7;
+    JTextField enterAddressTextField7;
+    JTextField enterPINTextField7;
+    
+    JTextField enterAccountTypeTextField8;
+    JTextField enterMoneyTextField8;
+    JTextField enterCoOwnersTextField8;
     
     int customerActionStatus = 0;
 
@@ -155,10 +164,24 @@ public class BankTellerInterface extends JFrame {
         enterCustomerTextField2.setPreferredSize(new Dimension(150,25));
         JButton submit2 = new JButton ("Submit");
         submit2.addActionListener ( new ActionListener () {
-            public void actionPerformed (ActionEvent e) {
-                // TODO Create Account
+            public void actionPerformed (ActionEvent ae) {
+                int i = -1;
+                try {
+                    i = Integer.parseInt (enterCustomerTextField2.getText());
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(null, "Invalid TID format");
+                    idleView();
+                    return;
+                }
+                Customer c = new Customer (i);
                 
-                idleView();
+                if (c.getID() == -1) {
+                    ((CardLayout)userInterface.getLayout()).show (userInterface, "createCustomerPanel");
+                }
+                else {
+                    ((CardLayout)userInterface.getLayout()).show (userInterface, "createAccountSettingsPanel");
+                }
+                
             }
         });
         createAcctPanel.add(cancel2);
@@ -168,7 +191,154 @@ public class BankTellerInterface extends JFrame {
         
         //end create acct panel-----------------------------------------
         
-    
+        //createAcctPanel --------------------------------------------
+        
+        
+        createCustomerPanel = new JPanel();
+        createCustomerPanel.setLayout(new FlowLayout());
+        /*
+        JButton cancel7 = new JButton ("Cancel");
+        cancel7.addActionListener ( new ActionListener (){
+            public void actionPerformed (ActionEvent e) {
+                idleView();
+            }
+        });
+        */
+        
+        JLabel createAcctLabel7  = new JLabel();
+        createAcctLabel7.setText("Customer Name: ");
+        enterCustomerNameTextField7 = new JTextField();
+        enterCustomerNameTextField7.setPreferredSize(new Dimension(150,25));
+        
+        JLabel addressLabel7  = new JLabel();
+        addressLabel7.setText("Address: ");
+        enterAddressTextField7 = new JTextField();
+        enterAddressTextField7.setPreferredSize(new Dimension(150,25));
+        
+        
+        JLabel PINLabel7  = new JLabel();
+        PINLabel7.setText("Set PIN: ");
+        enterPINTextField7 = new JTextField();
+        enterPINTextField7.setPreferredSize(new Dimension(150,25));
+        
+        JButton submit7 = new JButton ("Submit");
+        submit7.addActionListener ( new ActionListener () {
+            public void actionPerformed (ActionEvent ae) {
+                // TODO Create Account
+                boolean success = true;
+                try {
+                    Customer c = new Customer (Integer.parseInt (enterCustomerTextField2.getText()), enterCustomerNameTextField7.getText(), enterAddressTextField7.getText(),Integer.parseInt(enterPINTextField7.getText()));
+                    c.createCustomer();
+                } catch (Exception e) {
+                    success = false;
+                }
+                
+                if (success) {
+                    JOptionPane.showMessageDialog(null, "Create User Succeeded");
+                    ((CardLayout)userInterface.getLayout()).show (userInterface, "createAccountSettingsPanel");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Create User Failed");
+                    idleView();
+                }
+                
+            }
+        });
+        //createCustomerPanel.add(cancel7);
+        createCustomerPanel.add(createAcctLabel7);
+        createCustomerPanel.add(enterCustomerNameTextField7);
+        createCustomerPanel.add(addressLabel7);
+        createCustomerPanel.add(enterAddressTextField7);
+        createCustomerPanel.add(PINLabel7);
+        createCustomerPanel.add(enterPINTextField7);
+        createCustomerPanel.add(submit7);
+        
+        //end create acct panel-----------------------------------------
+        
+        //createAcctPanel --------------------------------------------
+        
+        
+         createAccountSettingsPanel = new JPanel();
+        /*
+         createAccountSettingsPanel.setLayout(new FlowLayout());
+         JButton cancel8 = new JButton ("Cancel");
+         cancel8.addActionListener ( new ActionListener (){
+         public void actionPerformed (ActionEvent e) {
+         idleView();
+         }
+         });
+         */
+        
+        JLabel createAcctLabel8  = new JLabel();
+        createAcctLabel8.setText("Account Type: ");
+        enterAccountTypeTextField8 = new JTextField();
+        enterAccountTypeTextField8.setPreferredSize(new Dimension(150,25));
+        
+        JLabel moneyLabel8  = new JLabel();
+        moneyLabel8.setText("$");
+        enterMoneyTextField8 = new JTextField();
+        enterMoneyTextField8.setPreferredSize(new Dimension(150,25));
+        
+        
+        JLabel coOwnersLabel8 = new JLabel();
+        coOwnersLabel8.setText("CoOwner TIDs (Must Be Existing): ");
+        enterCoOwnersTextField8 = new JTextField();
+        enterCoOwnersTextField8.setPreferredSize(new Dimension(150,25));
+        
+        JButton submit8 = new JButton ("Submit");
+        submit8.addActionListener ( new ActionListener () {
+            public void actionPerformed (ActionEvent ae) {
+                // TODO Create Account
+                int acctType = -1;
+                double interest_rate = 1;
+                String text = enterAccountTypeTextField8.getText();
+                if (text.equals ("0") || text.equals ("InterestChecking")) {
+                    acctType = 0;
+                    interest_rate = 1.055;
+                } else if (text.equals ("1") || text.equals ("StudentChecking")) {
+                    acctType = 1;
+                } else if (text.equals ("2") || text.equals ("Savings")) {
+                    acctType = 2;
+                    interest_rate = 1.075;
+                } else if (text.equals ("3") || text.equals ("Pocket")) {
+                    acctType = 3;
+                } else {
+                    JOptionPane.showMessageDialog(null, "Account Type Input Not Recognized \"" + text + "\"");
+                }
+                
+                if (acctType != -1) {
+                    double money = 0;
+                    try {
+                        money = Double.parseDouble (enterMoneyTextField8.getText());
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(null, "Money Input Not Recognized \"" + enterMoneyTextField8.getText() + "\"");
+                        idleView();
+                        return;
+                    }
+                    
+                    try {
+                        Account a = new Account (acctType, money, null, interest_rate, Integer.parseInt (enterCustomerTextField2.getText()));
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(null, "Create Account Failed");
+                        idleView();
+                        return;
+                    }
+                    JOptionPane.showMessageDialog(null, "Create Account Success");
+                    
+                }
+                
+                idleView();
+            }
+        });
+        //createAccountSettingsPanel.add(cancel7);
+        createAccountSettingsPanel.add(createAcctLabel8);
+        createAccountSettingsPanel.add(enterAccountTypeTextField8);
+        createAccountSettingsPanel.add(moneyLabel8);
+        createAccountSettingsPanel.add(enterMoneyTextField8);
+        createAccountSettingsPanel.add(coOwnersLabel8);
+        createAccountSettingsPanel.add(enterCoOwnersTextField8);
+        createAccountSettingsPanel.add(submit8);
+        
+        //end create acct panel-----------------------------------------
 
         
         //delTransPanrl --------------------------------------------
@@ -395,14 +565,14 @@ public class BankTellerInterface extends JFrame {
                         PreparedStatement stmt = DatabaseHelper.getInstance().createAction (updateQuery);
                         stmt.setFloat (1, Float.parseFloat (interestRateTextField6.getText()));
                         stmt.setInt (2, acctType);
-                        System.out.println ("Here");
+                        //System.out.println ("Here");
                         stmt.execute();
                         
-                        System.out.println ("Here1");
+                        //System.out.println ("Here1");
                     } catch (Exception e) {
                         success = false;
                     }
-                    System.out.println ("Here2");
+                    //System.out.println ("Here2");
                     
                     DatabaseHelper.getInstance().closeConnection();
                     
@@ -434,6 +604,8 @@ public class BankTellerInterface extends JFrame {
         userInterface.add (screen, "idleState");
         userInterface.add (enterCheckPanel, "enterCheckPanel");
         userInterface.add (createAcctPanel, "createAcctPanel");
+        userInterface.add (createCustomerPanel, "createCustomerPanel");
+        userInterface.add (createAccountSettingsPanel, "createAccountSettingsPanel");
         userInterface.add (delTransPanel, "delTransPanel");
         userInterface.add (customerIDPanel, "customerIDPanel");
         userInterface.add (setDatePanel, "setDatePanel");
@@ -512,7 +684,7 @@ public class BankTellerInterface extends JFrame {
         genDTERButton.addActionListener (new ActionListener () {
             public void actionPerformed (ActionEvent e) {
                 // TODO Generate DTER
-                
+                String query = "SELECT * FROM Customer WHERE ";
                 
                 JOptionPane.showMessageDialog(null, "DTER\nA\nB");
             }
@@ -693,10 +865,7 @@ public class BankTellerInterface extends JFrame {
                 DatabaseHelper.getInstance().closeConnection();
 
                 JOptionPane.showMessageDialog(null, "SUCCESS");
-                 idleView();
-            
-                
-        
+                idleView();
             }
         });
 
@@ -722,7 +891,7 @@ public class BankTellerInterface extends JFrame {
 
 
                 JOptionPane.showMessageDialog(null, "SUCCESS");
-                 idleView();
+                idleView();
             }
            
         });

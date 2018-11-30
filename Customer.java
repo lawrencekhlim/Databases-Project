@@ -27,6 +27,12 @@ public class Customer {
                 address = rs.getString("address");
                 PIN = Integer.parseInt(rs.getString("PIN"));
             }
+            else {
+                name = "";
+                address = "";
+                PIN = -1;
+                this.TID = -1;
+            }
         } catch (SQLException e) {
             name = "";
             address = "";
