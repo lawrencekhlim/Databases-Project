@@ -710,9 +710,9 @@ public class BankTellerInterface extends JFrame {
             public void actionPerformed (ActionEvent e) {
                 // TODO Add Interest (Must put in a value in the database!)
                 java.sql.Date date = new java.sql.Date( java.lang.System.currentTimeMillis());
-                String queryAddInterest = "UPDATE Account A SET A.moneyVal=A.moneyVal*A.annualRate";
-                String queryGetDate = "SELECT rateTrack.rateDate FROM RateTrack";
-                String querySetDate = "UPDATE rateTrack SET rateTrack.rateDate="+date;
+                String queryAddInterest = "SELECT A.account_id, A.moneyVal, A.annualRate FROM Account A";
+                String queryGetDate = "SELECT MAX(rateTrack.rateDate) AS maxDate FROM RateTrack";
+                String querySetDate = "UPDATE rateTrack SET rateTrack.rateDate="+current;
                 String insertVal = "INSERT INTO RateTrack (rateDate) VALUES (?)";
                 boolean flag = false;
                 long day30 = 31l * 24 * 60 * 60 * 1000;
@@ -726,7 +726,8 @@ public class BankTellerInterface extends JFrame {
                     ResultSet rs = DatabaseHelper.getInstance ().executeQuery(queryGetDate);
                     flag = false; // isNotEmpty
                     while (rs.next()) {
-                        lastupdate = rs.getDate ("rateDate");
+                        lastupdate = rs.getDate ("maxDate");
+                        System.out.println("lastupdate "+lastupdate);
                         flag = true;
                     }
 
@@ -740,8 +741,10 @@ public class BankTellerInterface extends JFrame {
 
                 //if the table is empty, insert val
 
-                if(!flag) {
+                ArrayList<Transaction> transactionsList = new ArrayList<>();
+                if(!flag || lastupdate.before(new java.sql.Date((current.getTime() - day30)))) {
                     //INSERT VAL
+                    System.out.println("ADDED VALUE");
                     DatabaseHelper.getInstance().openConnection();
                     PreparedStatement stmt = DatabaseHelper.getInstance ().createAction (insertVal);
                     try {
@@ -750,6 +753,7 @@ public class BankTellerInterface extends JFrame {
                     } catch (Exception ex) {
                         ex.printStackTrace();
                         JOptionPane.showMessageDialog(null, "ERROR");
+                        System.out.println("Erorr 1");
                             idleView();
                             return;
                     }
@@ -760,65 +764,45 @@ public class BankTellerInterface extends JFrame {
                     DatabaseHelper.getInstance().openConnection();
                     try {
                         ResultSet rs = DatabaseHelper.getInstance ().executeQuery(queryAddInterest);
+                        while (rs.next()) {
+                            int accountID = rs.getInt("account_id");
+                            double money = rs.getDouble("moneyVal");
+                            double intRate =  rs.getDouble("annualRate");
+                            System.out.println(accountID+" "+money+" "+ intRate);
+                            Transaction t = new Transaction(current,(float)(money*(intRate-1)),9,accountID, -1, false);
+                            transactionsList.add(t);
+                           
+                        }
 
                     } catch (Exception ex) {
                         ex.printStackTrace();
                         JOptionPane.showMessageDialog(null, "ERROR");
+                         System.out.println("Erorr 2");
                         idleView();
                         return;
                     }
                     DatabaseHelper.getInstance().closeConnection();
 
-                }
-                else
-                {
-                    //check what teh date was --> if valid
-
-                    if(lastupdate.before(new java.sql.Date((current.getTime() - day30))))
+                    for(int i =0; i<transactionsList.size(); i++)
                     {
-                        //change date in db
-                        DatabaseHelper.getInstance().openConnection();
-                        try {
-                        ResultSet rs = DatabaseHelper.getInstance ().executeQuery(querySetDate);
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                            JOptionPane.showMessageDialog(null, "ERROR");
-                            idleView();
-                            return;
-                        }
-                        DatabaseHelper.getInstance().closeConnection();
-
-                         //ADD INTEREST
-                        DatabaseHelper.getInstance().openConnection();
-                        try {
-                            ResultSet rs = DatabaseHelper.getInstance ().executeQuery(queryAddInterest);
-
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                            JOptionPane.showMessageDialog(null, "ERROR");
-                            idleView();
-                            return;
-                        }
-                        DatabaseHelper.getInstance().closeConnection();
+                        transactionsList.get(i).createID();
+                        transactionsList.get(i).createTransaction();
                     }
-                    else
-                    {
+
+                }
+                else if (!lastupdate.before(new java.sql.Date((current.getTime() - day30))))
+                {
                         JOptionPane.showMessageDialog(null, "You already added Interest this month");
                          idleView();
                         return;
-                    }
-
                 }
 
 
-                
                
                 JOptionPane.showMessageDialog(null, "SUCCESS");
                  idleView();
             
                 
-               
-                JOptionPane.showMessageDialog(null, "Success/Failure");
             }
             
         });
