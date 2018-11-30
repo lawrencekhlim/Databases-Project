@@ -707,7 +707,11 @@ public class ATMInterface extends JFrame {
                 for(int i =0; i<allCheckingSavingAccts.size(); i++)
                 {
                     //System.out.println("we in: "+allCheckingSavingAccts.get(i).getAccountID());
-                    allAcctIDs.add(allCheckingSavingAccts.get(i).getAccountID());
+                    if(allCheckingSavingAccts.get(i).getDeleteDate()==null)
+                    {
+                        allAcctIDs.add(allCheckingSavingAccts.get(i).getAccountID());
+                    }
+                    
                 }
                 comboBox2.setModel(new DefaultComboBoxModel(allAcctIDs.toArray()));
 
@@ -741,8 +745,10 @@ public class ATMInterface extends JFrame {
                 ArrayList<Integer> allAcctIDs =  new ArrayList<>();
                 for(int i =0; i<allCheckingSavingAccts.size(); i++)
                 {
-                    //System.out.println("we in: "+allCheckingSavingAccts.get(i).getAccountID());
-                    allAcctIDs.add(allCheckingSavingAccts.get(i).getAccountID());
+                    if(allCheckingSavingAccts.get(i).getDeleteDate()==null)
+                    {
+                        allAcctIDs.add(allCheckingSavingAccts.get(i).getAccountID());
+                    }
                 }
                 comboBox3.setModel(new DefaultComboBoxModel(allAcctIDs.toArray()));
 
@@ -751,7 +757,10 @@ public class ATMInterface extends JFrame {
                  for(int i =0; i<pocketAccts.size(); i++)
                  {
                     //System.out.println("we in2: "+pocketAccts.get(i).getAccountID());
-                    pocketAcctIDs.add(pocketAccts.get(i).getAccountID());
+                    if(pocketAccts.get(i).getDeleteDate()==null)
+                    {
+                         pocketAcctIDs.add(pocketAccts.get(i).getAccountID());
+                    }
                  }
                  
                  sendToDropDown.setModel(new DefaultComboBoxModel(pocketAcctIDs.toArray()));
@@ -781,8 +790,10 @@ public class ATMInterface extends JFrame {
                 ArrayList<Integer> allAcctIDs =  new ArrayList<>();
                 for(int i =0; i<allCheckingSavingAccts.size(); i++)
                 {
-                    //System.out.println("we in: "+allCheckingSavingAccts.get(i).getAccountID());
-                    allAcctIDs.add(allCheckingSavingAccts.get(i).getAccountID());
+                    if(allCheckingSavingAccts.get(i).getDeleteDate()==null)
+                    {
+                        allAcctIDs.add(allCheckingSavingAccts.get(i).getAccountID());
+                    }
                 }
                 comboBox2.setModel(new DefaultComboBoxModel(allAcctIDs.toArray()));
 
@@ -805,7 +816,10 @@ public class ATMInterface extends JFrame {
                  for(int i =0; i<pocketAccts.size(); i++)
                  {
                     //System.out.println("we in2: "+pocketAccts.get(i).getAccountID());
-                    pocketAcctIDs.add(pocketAccts.get(i).getAccountID());
+                    if(pocketAccts.get(i).getDeleteDate()==null)
+                    {
+                         pocketAcctIDs.add(pocketAccts.get(i).getAccountID());
+                    }
                  }
                  
                  comboBox2.setModel(new DefaultComboBoxModel(pocketAcctIDs.toArray()));
@@ -838,8 +852,10 @@ public class ATMInterface extends JFrame {
                 ArrayList<Integer> allAcctIDs =  new ArrayList<>();
                 for(int i =0; i<allCheckingSavingAccts.size(); i++)
                 {
-                    //System.out.println("we in: "+allCheckingSavingAccts.get(i).getAccountID());
-                    allAcctIDs.add(allCheckingSavingAccts.get(i).getAccountID());
+                    if(allCheckingSavingAccts.get(i).getDeleteDate()==null)
+                    {
+                        allAcctIDs.add(allCheckingSavingAccts.get(i).getAccountID());
+                    }
                 }
                 comboBox3.setModel(new DefaultComboBoxModel(allAcctIDs.toArray()));
                 sendToDropDown.setModel(new DefaultComboBoxModel(allAcctIDs.toArray()));
@@ -869,8 +885,10 @@ public class ATMInterface extends JFrame {
                 ArrayList<Integer> allAcctIDs =  new ArrayList<>();
                 for(int i =0; i<allCheckingSavingAccts.size(); i++)
                 {
-                    //System.out.println("we in: "+allCheckingSavingAccts.get(i).getAccountID());
-                    allAcctIDs.add(allCheckingSavingAccts.get(i).getAccountID());
+                    if(allCheckingSavingAccts.get(i).getDeleteDate()==null)
+                    {
+                        allAcctIDs.add(allCheckingSavingAccts.get(i).getAccountID());
+                    }
                 }
                 sendToDropDown.setModel(new DefaultComboBoxModel(allAcctIDs.toArray()));
 
@@ -879,7 +897,10 @@ public class ATMInterface extends JFrame {
                  for(int i =0; i<pocketAccts.size(); i++)
                  {
                     //System.out.println("we in2: "+pocketAccts.get(i).getAccountID());
-                    pocketAcctIDs.add(pocketAccts.get(i).getAccountID());
+                    if(pocketAccts.get(i).getDeleteDate()==null)
+                    {
+                         pocketAcctIDs.add(pocketAccts.get(i).getAccountID());
+                    }
                  }
                  
                  comboBox3.setModel(new DefaultComboBoxModel(pocketAcctIDs.toArray()));
@@ -910,8 +931,10 @@ public class ATMInterface extends JFrame {
                 ArrayList<Integer> allAcctIDs =  new ArrayList<>();
                 for(int i =0; i<allCheckingSavingAccts.size(); i++)
                 {
-                    //System.out.println("we in: "+allCheckingSavingAccts.get(i).getAccountID());
-                    allAcctIDs.add(allCheckingSavingAccts.get(i).getAccountID());
+                    if(allCheckingSavingAccts.get(i).getDeleteDate()==null)
+                    {
+                        allAcctIDs.add(allCheckingSavingAccts.get(i).getAccountID());
+                    }
                 }
                 comboBox3.setModel(new DefaultComboBoxModel(allAcctIDs.toArray()));
                 sendToDropDown.setModel(new DefaultComboBoxModel(allAcctIDs.toArray()));
@@ -936,7 +959,11 @@ public class ATMInterface extends JFrame {
                  for(int i =0; i<pocketAccts.size(); i++)
                  {
                     //System.out.println("we in2: "+pocketAccts.get(i).getAccountID());
-                    pocketAcctIDs.add(pocketAccts.get(i).getAccountID());
+                    if(pocketAccts.get(i).getDeleteDate()==null)
+                    {
+                         pocketAcctIDs.add(pocketAccts.get(i).getAccountID());
+                    }
+                   
                  }
                  
                  comboBox3.setModel(new DefaultComboBoxModel(pocketAcctIDs.toArray()));

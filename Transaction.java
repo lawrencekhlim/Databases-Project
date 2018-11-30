@@ -15,6 +15,7 @@ import java.util.ArrayList;
 //10 - fees
 
 public class Transaction {
+     java.sql.Date current = new java.sql.Date(java.lang.System.currentTimeMillis());
     private int transaction_id;
     private Date transDate;
     private float moneyTrans;
@@ -121,6 +122,10 @@ public class Transaction {
             if(decrAccount.getMoney()<moneyTrans) {
                 System.out.println("NEGATIVE BALANCE");
                 return false;
+            }
+            else if(decrAccount.getMoney()-moneyTrans<.01) {
+                System.out.println("NEGATIVE BALANCE");
+                decrAccount.setDeleteDate(current);
             }
 
         }

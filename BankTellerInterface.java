@@ -114,14 +114,19 @@ public class BankTellerInterface extends JFrame {
         JButton submit1 = new JButton ("Submit");
         submit1.addActionListener ( new ActionListener () {
             public void actionPerformed (ActionEvent ae) {
-                int TID = -1;
+                int acctId = -1;
                 boolean success = false;
 
                 try { //Try to make the input into an integer
-                    TID = Integer.parseInt(accountNumberTextField1.getText());
-                    float increase = Float.parseFloat(enterCheckTextField1.getText());
-                    Transaction trans = new Transaction (current, increase, 0, TID, -1);
+                    acctId = Integer.parseInt(accountNumberTextField1.getText());
+                    Account a  = new Account(acctId);
+                    if(a.getDeleteDate()==null)
+                    {
+                        float increase = Float.parseFloat(enterCheckTextField1.getText());
+                    Transaction trans = new Transaction (current, increase, 0, acctId, -1);
                     success = trans.createTransaction();
+                    }
+                    
                 }
                 catch(Exception e) {
                     success = false;
