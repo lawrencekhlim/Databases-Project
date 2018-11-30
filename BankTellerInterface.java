@@ -315,8 +315,9 @@ public class BankTellerInterface extends JFrame {
                         return;
                     }
                     
+                    Account a;
                     try {
-                        Account a = new Account (acctType, money, null, interest_rate, Integer.parseInt (enterCustomerTextField2.getText()));
+                        a = new Account (acctType, money, null, interest_rate, Integer.parseInt (enterCustomerTextField2.getText()));
                     } catch (Exception e) {
                         JOptionPane.showMessageDialog(null, "Create Account Failed");
                         idleView();
@@ -324,6 +325,43 @@ public class BankTellerInterface extends JFrame {
                     }
                     JOptionPane.showMessageDialog(null, "Create Account Success");
                     
+                    if (!enterCoOwnersTextField8.getText().equals("")) {
+                        String [] arr = enterCoOwnersTextField8.getText().split(",");
+                        for (int i = 0; i < arr.length; i++) {
+                            boolean success = true;
+                            Customer c = null;
+                            try {
+                                c = new Customer (Integer.parseInt(arr[i]));
+                            } catch (Exception e) {
+                                success = false;
+                            }
+                            
+                            success = success && (c.getID () != -1);
+                            if (!success) {
+                                JOptionPane.showMessageDialog(null, "CoOwner Tuple Not Created: \""+arr[i]+"\" not a Customer");
+                            } else if (arr[i].equals(enterCustomerTextField2.getText()))  {
+                                JOptionPane.showMessageDialog(null, "CoOwner Tuple Not Created: \""+arr[i]+"\" is already Primary Owner");
+                            } else {
+                                DatabaseHelper.getInstance().openConnection();
+                                String query = "INSERT INTO CoOwner (TID, account_id) VALUES (?, ?)";
+                                PreparedStatement stmt = DatabaseHelper.getInstance().createAction (query);
+                                try {
+                                    stmt.setInt (1, Integer.parseInt(arr[i]));
+                                    stmt.setInt (2, a.getAccountID());
+                                    stmt.execute();
+                                } catch (Exception e) {
+                                    success = false;
+                                }
+                                DatabaseHelper.getInstance().closeConnection();
+                                
+                                if (success) {
+                                    JOptionPane.showMessageDialog(null, "CoOwner Tuple Created With TID " + arr[i]);
+                                } else {
+                                    JOptionPane.showMessageDialog(null, "CoOwner Tuple Not Created");
+                                }
+                            }
+                        }
+                    }
                 }
                 
                 idleView();
