@@ -33,8 +33,8 @@ CREATE TABLE PocketAccount (account_id      INTEGER,
                             linked_account  INTEGER NOT NULL,
                             recent_fee      DATE,
                             PRIMARY KEY (account_id),
-                            FOREIGN KEY (account_id) REFERENCES Account (account_id),
-                            FOREIGN KEY (linked_account) REFERENCES Account (account_id));
+                            FOREIGN KEY (account_id) REFERENCES Account (account_id) ON DELETE CASCADE,
+                            FOREIGN KEY (linked_account) REFERENCES Account (account_id)) ON DELETE CASCADE;
 
 CREATE TABLE RateTrack(rateDate DATE);
 
