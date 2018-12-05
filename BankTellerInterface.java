@@ -625,8 +625,43 @@ public class BankTellerInterface extends JFrame {
                     JOptionPane.showMessageDialog(null, "Changed date to " + current.toString());
                 }  else
                     JOptionPane.showMessageDialog(null, "Unable to change date to \"" + setDateTextField5.getText() +"\"");
-                    
                 
+                String queryAddInterest = "SELECT A.account_id, A.moneyVal, A.annualRate FROM Account A";
+                String queryGetDate = "SELECT MAX(rateTrack.rateDate) AS maxDate FROM RateTrack";
+                String querySetDate = "UPDATE rateTrack SET rateTrack.rateDate="+current;
+                String insertVal = "INSERT INTO RateTrack (rateDate) VALUES (?)";
+                boolean flag = false;
+                long day30 = 31l * 24 * 60 * 60 * 1000;
+                
+                
+                java.sql.Date lastupdate = null;
+                
+                //get last date
+                DatabaseHelper.getInstance().openConnection();
+                try {
+                    ResultSet rs = DatabaseHelper.getInstance ().executeQuery(queryGetDate);
+                    flag = false; // isNotEmpty
+                    if (rs.next()) {
+                        lastupdate = rs.getDate ("maxDate");
+                        System.out.println("lastupdate "+lastupdate);
+                        if (lastupdate != null)
+                            flag = true;
+                    }
+                    
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "ERROR");
+                    idleView();
+                    return;
+                }
+                DatabaseHelper.getInstance().closeConnection();
+                
+                //if the table is empty, insert val
+                
+                ArrayList<Transaction> transactionsList = new ArrayList<>();
+                if(!flag || lastupdate.before(new java.sql.Date((current.getTime() - day30)))) {
+                    addInterest(transactionsList);
+                }
                 idleView();
             }
         });
@@ -818,7 +853,7 @@ public class BankTellerInterface extends JFrame {
                     //flag = false; // isNotEmpty
                     while (rs.next()) {
                         acctID = rs.getInt ("TID");
-                        System.out.println("TID rich boiz "+acctID);
+                        //System.out.println("TID rich boiz "+acctID);
                         idsNames.add(acctID);
                         //flag = true;
                     }
@@ -863,7 +898,7 @@ public class BankTellerInterface extends JFrame {
         addInterestButton.addActionListener(new ActionListener () {
             public void actionPerformed (ActionEvent e) {
                 // TODO Add Interest (Must put in a value in the database!)
-                java.sql.Date date = new java.sql.Date( java.lang.System.currentTimeMillis());
+                //java.sql.Date date = new java.sql.Date( java.lang.System.currentTimeMillis());
                 String queryAddInterest = "SELECT A.account_id, A.moneyVal, A.annualRate FROM Account A";
                 String queryGetDate = "SELECT MAX(rateTrack.rateDate) AS maxDate FROM RateTrack";
                 String querySetDate = "UPDATE rateTrack SET rateTrack.rateDate="+current;
@@ -879,11 +914,12 @@ public class BankTellerInterface extends JFrame {
                  try {
                     ResultSet rs = DatabaseHelper.getInstance ().executeQuery(queryGetDate);
                     flag = false; // isNotEmpty
-                    while (rs.next()) {
-                        lastupdate = rs.getDate ("maxDate");
-                        System.out.println("lastupdate "+lastupdate);
-                        flag = true;
-                    }
+                     if (rs.next()) {
+                         lastupdate = rs.getDate ("maxDate");
+                         System.out.println("lastupdate "+lastupdate);
+                         if (lastupdate != null)
+                             flag = true;
+                     }
 
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -897,66 +933,16 @@ public class BankTellerInterface extends JFrame {
 
                 ArrayList<Transaction> transactionsList = new ArrayList<>();
                 if(!flag || lastupdate.before(new java.sql.Date((current.getTime() - day30)))) {
-                    //INSERT VAL
-                    System.out.println("ADDED VALUE");
-                    DatabaseHelper.getInstance().openConnection();
-                    PreparedStatement stmt = DatabaseHelper.getInstance ().createAction (insertVal);
-                    try {
-                         stmt.setDate (1, current);
-                         stmt.execute();
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                        JOptionPane.showMessageDialog(null, "ERROR");
-                        System.out.println("Erorr 1");
-                            idleView();
-                            return;
-                    }
-                    DatabaseHelper.getInstance().closeConnection();
-
-
-                    //ADD INTEREST
-                    DatabaseHelper.getInstance().openConnection();
-                    try {
-                        ResultSet rs = DatabaseHelper.getInstance ().executeQuery(queryAddInterest);
-                        while (rs.next()) {
-                            int accountID = rs.getInt("account_id");
-                            double money = rs.getDouble("moneyVal");
-                            double intRate =  rs.getDouble("annualRate");
-                            System.out.println(accountID+" "+money+" "+ intRate);
-                            Transaction t = new Transaction(current,(float)(money*(intRate-1)/12),9,accountID, -1, false);
-                            transactionsList.add(t);
-                           
-                        }
-
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                        JOptionPane.showMessageDialog(null, "ERROR");
-                         System.out.println("Erorr 2");
-                        idleView();
-                        return;
-                    }
-                    DatabaseHelper.getInstance().closeConnection();
-
-                    for(int i =0; i<transactionsList.size(); i++)
-                    {
-                        transactionsList.get(i).createID();
-                        transactionsList.get(i).createTransaction();
-                    }
-
+                    addInterest(transactionsList);
                 }
-                else if (!lastupdate.before(new java.sql.Date((current.getTime() - day30))))
-                {
+                else if (!lastupdate.before(new java.sql.Date((current.getTime() - day30)))) {
                         JOptionPane.showMessageDialog(null, "You already added Interest this month");
-                         idleView();
-                        return;
+                    idleView();
+                    return;
                 }
-
-
                
                 JOptionPane.showMessageDialog(null, "SUCCESS");
-                 idleView();
-            
-                
+                idleView();
             }
             
         });
@@ -1090,5 +1076,53 @@ public class BankTellerInterface extends JFrame {
     public static void main(String[] args) {
         BankTellerInterface ex = new BankTellerInterface();
         ex.setVisible(true);
+    }
+    
+    public void addInterest (ArrayList<Transaction> transactionsList) {
+        String queryAddInterest = "SELECT A.account_id, A.moneyVal, A.annualRate FROM Account A";
+        String insertVal = "INSERT INTO RateTrack (rateDate) VALUES (?)";
+        System.out.println("ADDED VALUE");
+        DatabaseHelper.getInstance().openConnection();
+        PreparedStatement stmt = DatabaseHelper.getInstance ().createAction (insertVal);
+        try {
+            stmt.setDate (1, current);
+            stmt.execute();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "ERROR");
+            System.out.println("Error 1");
+            idleView();
+            return;
+        }
+        DatabaseHelper.getInstance().closeConnection();
+        
+        
+        //ADD INTEREST
+        DatabaseHelper.getInstance().openConnection();
+        try {
+            ResultSet rs = DatabaseHelper.getInstance ().executeQuery(queryAddInterest);
+            while (rs.next()) {
+                int accountID = rs.getInt("account_id");
+                double money = rs.getDouble("moneyVal");
+                double intRate =  rs.getDouble("annualRate");
+                System.out.println(accountID+" "+money+" "+ intRate);
+                Transaction t = new Transaction(current,(float)(money*(intRate-1)/12),9,accountID, -1, false);
+                transactionsList.add(t);
+                
+            }
+            
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "ERROR");
+            System.out.println("Error 2");
+            idleView();
+            return;
+        }
+        DatabaseHelper.getInstance().closeConnection();
+        
+        for(int i =0; i<transactionsList.size(); i++) {
+            transactionsList.get(i).createID();
+            transactionsList.get(i).createTransaction();
+        }
     }
 }

@@ -183,6 +183,7 @@ public class ATMInterface extends JFrame {
                     Transaction t = null;
                     try{
                         Account fromAcct = new Account (Integer.parseInt(acct)).getLinkedAccount();
+                        System.out.println ("ID = " + fromAcct.getAccountID());
                         t = new Transaction(date,
                                             Float.parseFloat(m),
                                             1,

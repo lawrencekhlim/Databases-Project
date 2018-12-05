@@ -116,12 +116,6 @@ public class Transaction {
                 System.out.println("NEGATIVE BALANCE or closed account");
                 return false;
             }
-
-            else if(decrAccount.getMoney()-moneyTrans<.01) {
-                //System.out.println("NEGATIVE BALANCE");
-                decrAccount.setDeleteDate(current);
-                return false;
-            }
         }
         
         //System.out.println ("Hello");
