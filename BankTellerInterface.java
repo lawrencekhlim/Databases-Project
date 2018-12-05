@@ -37,6 +37,7 @@ public class BankTellerInterface extends JFrame {
     JTextField enterCheckTextField1;
     
     JTextField enterCustomerTextField2;
+    
     JTextField transactionTextField3;
     
     JTextField customerTIDTextField4;
@@ -50,6 +51,7 @@ public class BankTellerInterface extends JFrame {
     JTextField enterAddressTextField7;
     JTextField enterPINTextField7;
     
+    JTextField enterAcctNumberTextField8;
     JTextField enterAccountTypeTextField8;
     JTextField enterMoneyTextField8;
     JTextField enterCoOwnersTextField8;
@@ -164,6 +166,7 @@ public class BankTellerInterface extends JFrame {
             }
         });
         
+        
         JLabel createAcctLabel2  = new JLabel();
         createAcctLabel2.setText("Customer TID");
         enterCustomerTextField2 = new JTextField();
@@ -190,6 +193,7 @@ public class BankTellerInterface extends JFrame {
                 
             }
         });
+        
         createAcctPanel.add(cancel2);
         createAcctPanel.add(createAcctLabel2);
         createAcctPanel.add(enterCustomerTextField2);
@@ -197,7 +201,7 @@ public class BankTellerInterface extends JFrame {
         
         //end create acct panel-----------------------------------------
         
-        //createAcctPanel --------------------------------------------
+        //createCustomerPanel --------------------------------------------
         
         
         createCustomerPanel = new JPanel();
@@ -234,7 +238,7 @@ public class BankTellerInterface extends JFrame {
                 boolean success = true;
                 try {
                     Customer c = new Customer (Integer.parseInt (enterCustomerTextField2.getText()), enterCustomerNameTextField7.getText(), enterAddressTextField7.getText(),Integer.parseInt(enterPINTextField7.getText()));
-                    c.createCustomer();
+                    success = c.createCustomer();
                 } catch (Exception e) {
                     success = false;
                 }
@@ -273,6 +277,11 @@ public class BankTellerInterface extends JFrame {
          }
          });
          */
+        
+        JLabel accountNumberLabel8 = new JLabel ();
+        accountNumberLabel8.setText ("Account ID");
+        enterAcctNumberTextField8 = new JTextField ();
+        enterAcctNumberTextField8.setPreferredSize(new Dimension(150,25));
         
         JLabel createAcctLabel8  = new JLabel();
         createAcctLabel8.setText("Account Type: ");
@@ -319,7 +328,7 @@ public class BankTellerInterface extends JFrame {
                 if (acctType == 3) {
                     boolean createdAccount = true;
                     try {
-                        a = new Account (acctType, 0, null, interest_rate, Integer.parseInt (enterCustomerTextField2.getText()), false);
+                        a = new Account (Integer.parseInt (enterAcctNumberTextField8.getText()), acctType, 0, null, interest_rate, Integer.parseInt (enterCustomerTextField2.getText()), false);
                         createdAccount = a.createAccount (current);
                     } catch (Exception e) {
                         createdAccount = false;
@@ -441,6 +450,8 @@ public class BankTellerInterface extends JFrame {
             }
         });
         //createAccountSettingsPanel.add(cancel7);
+        createAccountSettingsPanel.add(accountNumberLabel8);
+        createAccountSettingsPanel.add(enterAcctNumberTextField8);
         createAccountSettingsPanel.add(createAcctLabel8);
         createAccountSettingsPanel.add(enterAccountTypeTextField8);
         createAccountSettingsPanel.add(moneyLabel8);

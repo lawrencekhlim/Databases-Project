@@ -80,10 +80,8 @@ public class ATMInterface extends JFrame {
                 ArrayList<String> allPins = new ArrayList<>();
                 allPins = Customer.getAllPins();
 
-                for(int i =0; i<allPins.size(); i++)
-                {
-                    if(allPins.get(i).equals(pinID))
-                    {
+                for(int i =0; i<allPins.size(); i++) {
+                    if(allPins.get(i).equals(pinID)) {
                         System.out.println("We have a mach!");
                         loggedCust = new Customer(pinID);
                         System.out.print(loggedCust.getName());
@@ -95,13 +93,11 @@ public class ATMInterface extends JFrame {
                 if(loggedCust==null)
                 {
                     JOptionPane.showMessageDialog(null, "ERROR! Pin is not linked to an account.");
-
                 }
             }
         });
         
-      
-        
+
         screen.add(instruction);
         screen.add(userInput);
         screen.add(submitButton);
@@ -172,16 +168,39 @@ public class ATMInterface extends JFrame {
                 String m = moneyChanged2.getText();
                    
                 java.sql.Date date = current;
-                if(actionStatus==2)
-                {
-                    //deposit:Add money to the checking or savings account balance.
-                    if( m==null || acct==null)
-                    {
+                if (actionStatus == 3) {
+                    
+                    if(m==null || acct==null) {
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
+                    }
+                    
+                    Transaction t = null;
+                    try{
+                        Account fromAcct = new Account (Integer.parseInt(acct)).getLinkedAccount();
+                        t = new Transaction(date,
+                                            Float.parseFloat(m),
+                                            1,
+                                            Integer.parseInt(acct),
+                                            fromAcct.getAccountID());
+                    }
+                    catch(NumberFormatException ex){
                         
                     }
-
                     
+                    boolean valid  = t.createTransaction();
+                    if(!valid) {
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Operation.");
+                    }
+                    else {
+                        JOptionPane.showMessageDialog(null, "SUCCESS");
+                    }
+                }
+                else if(actionStatus==2) {
+                    //deposit:Add money to the checking or savings account balance.
+                    if( m==null || acct==null) {
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
+                    }
+
                     Transaction t = null;
                     try{
                         t = new Transaction(date,Float.parseFloat(m), 0,Integer.parseInt(acct),-1);
@@ -198,22 +217,19 @@ public class ATMInterface extends JFrame {
                     }
 
                 }
-                else if(actionStatus==4)
-                {
+                else if(actionStatus==4) {
 
                     //withdrawl:subtract money to the checking or savings account balance.
                     if( m==null || acct==null) {
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
                     }
-
-                    
+ 
                     Transaction t = null;
                     try{
                         t = new Transaction(date,Float.parseFloat(m), 2,-1,Integer.parseInt(acct));
 
                     } catch(NumberFormatException ex){
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Format.");
-                        
                     }
                     boolean valid  = t.createTransaction();
                     if(!valid) {
@@ -229,33 +245,65 @@ public class ATMInterface extends JFrame {
                     if(m==null || acct==null)
                     {
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
-                        
                     }
                     Transaction t = null;
                     try{
                         t = new Transaction(date,Float.parseFloat(m), 3,-1,Integer.parseInt(acct));
-
+                        
                     } catch(NumberFormatException ex){
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Format.");
                         
                     }
                     
-                    boolean valid  = t.createTransaction();
+                    boolean valid  = t.createPocketTransaction(current);
                     if(!valid)
                     {
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Operation.");
-                        
                     }
-                    else
-                    {
+                    else {
                         JOptionPane.showMessageDialog(null, "SUCCESS");
-                          
                     }
 
-                   
                 }
-                 idleView();
-
+                else if(actionStatus==7) {
+                    //collect: Move money from the pocket account back to the linked checking/savings account,
+                    //there will be a 3% fee assessed.
+                    
+                    if(acct==null || m==null)
+                    {
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
+                    }
+                    
+                    Transaction fee = null;
+                    Transaction t = null;
+                    float minMoney = 0;
+                    try{
+                        fee = new Transaction(date,(float)(Float.parseFloat(m)*0.03), 10,-1,Integer.parseInt(acct));
+                        t = new Transaction(date,Float.parseFloat(m), 5, new Account (Integer.parseInt(acct)).getLinkedAccount().getAccountID() ,Integer.parseInt(acct));
+                        minMoney = (float)(new Account(Integer.parseInt(acct))).getMoney();
+                        
+                    }catch(NumberFormatException ex){
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Format.");
+                    }
+                    boolean valid = false;
+                    
+                    
+                    if(t!=null && fee!=null) {
+                        boolean  valid1 = t.createTransaction();
+                        fee.createID();
+                        boolean valid2 =  fee.createTransaction();
+                        //System.out.println("t "+valid1 +"   -  fee "+valid2);
+                        valid = valid1 && valid2;
+                    }
+                    if(!valid || minMoney<(float)(Float.parseFloat(m)*1.03)) {
+                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Operation.");
+                    }
+                    else {
+                        JOptionPane.showMessageDialog(null, "SUCCESS");
+                    }
+                    
+                }
+                idleView();
             }
         });
         
@@ -306,41 +354,7 @@ public class ATMInterface extends JFrame {
         confirmButton3.addActionListener(new ActionListener () {
             public void actionPerformed (ActionEvent e) {
                 ((CardLayout)userInterface.getLayout()).show (userInterface, "idleState");
-                if(actionStatus==3) {
-                    //top up: move money from linked checking/saving into pocket acct
-                    String fromAcct = comboBox3.getSelectedItem().toString();
-                    String toAcct = sendToDropDown.getSelectedItem().toString();
-                    String m = moneyChanged3.getText();
-                   
-                    java.sql.Date date = current;
-
-                    if(fromAcct==null || m==null || toAcct==null) {
-                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
-                        
-                    }
-
-                    Transaction t = null;
-                    try{
-                        t = new Transaction(date,Float.parseFloat(m), 1,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
-                    }
-                    catch(NumberFormatException ex){
-
-                    }
-
-                    
-                    boolean valid  = t.createTransaction();
-                    if(!valid) {
-                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Operation.");
-                        
-                    }
-                    else {
-                        JOptionPane.showMessageDialog(null, "SUCCESS");
-                         
-                    }
-
-                }
-                else if(actionStatus==6)
-                {
+                if(actionStatus==6) {
                     //transfer: move money from checking/savings to another checking/savings
                     //must have atleast one owner in common, cannot exced over 2000 dollars
 
@@ -352,10 +366,9 @@ public class ATMInterface extends JFrame {
                    
                     java.sql.Date date = current;
 
-                    if(fromAcct==null || m==null || toAcct==null)
+                    if (fromAcct==null || m==null || toAcct==null)
                     {
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
-                        
                     }
 
                     Transaction t = null;
@@ -363,73 +376,20 @@ public class ATMInterface extends JFrame {
                          t = new Transaction(date,Float.parseFloat(m), 4,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
                     }catch(NumberFormatException ex){
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Format.");
-                        
                     }
                    
                     boolean valid  = t.createTransaction();
                     if (Float.parseFloat(m)>2000){
                         JOptionPane.showMessageDialog(null, "ERROR! Money transferred cannot be above $2000.");
-                        
                     }
                     else if(!valid)
                     {
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Operation.");
-                        
                     }
                     else
                     {
                         JOptionPane.showMessageDialog(null, "SUCCESS");
-                        
                     }
-                }
-                else if(actionStatus==7)
-                {
-                    //collect: Move money from the pocket account back to the linked checking/savings account, 
-                    //there will be a 3% fee assessed.
-                    String fromAcct = comboBox3.getSelectedItem().toString();
-                    String toAcct = sendToDropDown.getSelectedItem().toString();
-                    String m = moneyChanged3.getText();
-
-                    java.sql.Date date = current;
-                    if(fromAcct==null || m==null || toAcct==null)
-                    {
-                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Information.");
-                        
-                    } 
-
-                    Transaction fee = null;
-                    Transaction t = null;
-                    float minMoney = 0;
-                    try{
-                        fee = new Transaction(date,(float)(Float.parseFloat(m)*0.03), 10,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
-                        t = new Transaction(date,Float.parseFloat(m), 5,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));   
-                     minMoney = (float)(new Account(Integer.parseInt(fromAcct))).getMoney();
-                   
-                    }catch(NumberFormatException ex){
-                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Format.");
-                        
-                    }
-                    boolean valid = false;
-
-                   
-                    if(t!=null && fee!=null) {
-                       boolean  valid1 = t.createTransaction();
-                       fee.createID();
-                        boolean valid2 =  fee.createTransaction();
-                        //System.out.println("t "+valid1 +"   -  fee "+valid2);
-                        valid = valid1 &&valid2;
-                    }
-                    if(!valid || minMoney<(float)(Float.parseFloat(m)*1.03))
-                    {
-                        JOptionPane.showMessageDialog(null, "ERROR! Invalid Operation.");
-                       
-                    }
-                    else
-                    {
-                        JOptionPane.showMessageDialog(null, "SUCCESS");
-                          
-                    }
-
                 }
                 else if(actionStatus==8)
                 {
@@ -497,16 +457,18 @@ public class ATMInterface extends JFrame {
                         
                     } 
                     Transaction t = null;
+                    boolean valid = true;
                     try{
-                         t = new Transaction(date,Float.parseFloat(m), 6,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));   
-
+                        
+                        t = new Transaction(date,Float.parseFloat(m), 6,Integer.parseInt(toAcct),Integer.parseInt(fromAcct));
+                        Account a = new Account (Integer.parseInt(toAcct));
+                        valid = valid && a.getAccountType() == 3;
                     }catch(NumberFormatException ex){
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Format.");
-                       
+                        valid = false;
                     }
-
                    
-                    boolean valid  = t.createTransaction();
+                    valid = valid && t.createPocketTransaction(current);
                     if(!valid) {
                         JOptionPane.showMessageDialog(null, "ERROR! Invalid Operation.");
                     }
@@ -718,18 +680,18 @@ public class ATMInterface extends JFrame {
         gridButtons.add(topUpButton);
         topUpButton.addActionListener (new ActionListener () {
             public void actionPerformed (ActionEvent e) {
-                ((CardLayout)userInterface.getLayout()).show (userInterface, "twoAccountTrans");
+                ((CardLayout)userInterface.getLayout()).show (userInterface, "singleAccountTrans");
                 actionStatus = 3;
-                sendToField3.setVisible(false);
                 setGridButtonsVisible (false);
                 topUpButton.setVisible (true);
-                sendToDropDown.setVisible(true);
 
                 //TODO: so nothing works right now, but whenever we get all the account stuff to work,
                 // we need to write better queries for differentiating between types for coOwner stuff
                 //as well
                 //POPULATION IN THE NATION
-                ArrayList<Account> allCheckingSavingAccts  = new ArrayList<>();
+                
+                /*
+                ArrayList<Account> allCheckingSavingAccts = new ArrayList<>();
                 allCheckingSavingAccts.addAll(loggedCust.getAccountOfType(0));
                 allCheckingSavingAccts.addAll(loggedCust.getAccountOfType(1));
                 allCheckingSavingAccts.addAll(loggedCust.getAccountOfType(2));
@@ -743,6 +705,7 @@ public class ATMInterface extends JFrame {
                     }
                 }
                 comboBox3.setModel(new DefaultComboBoxModel(allAcctIDs.toArray()));
+                 */
 
                  ArrayList<Integer> pocketAcctIDs  = new ArrayList<>();
                  ArrayList<Account> pocketAccts = loggedCust.getAccountOfType(3);
@@ -754,11 +717,7 @@ public class ATMInterface extends JFrame {
                          pocketAcctIDs.add(pocketAccts.get(i).getAccountID());
                     }
                  }
-                 
-                 sendToDropDown.setModel(new DefaultComboBoxModel(pocketAcctIDs.toArray()));
-
-
-
+                 comboBox2.setModel(new DefaultComboBoxModel(pocketAcctIDs.toArray()));
 
             }
         });
@@ -861,14 +820,15 @@ public class ATMInterface extends JFrame {
         gridButtons.add(collectButton);
         collectButton.addActionListener (new ActionListener () {
             public void actionPerformed (ActionEvent e) {
-                ((CardLayout)userInterface.getLayout()).show (userInterface, "twoAccountTrans");
+                ((CardLayout)userInterface.getLayout()).show (userInterface, "singleAccountTrans");
                 actionStatus = 7;
-                sendToField3.setVisible(false);
+                //sendToField3.setVisible(false);
                 setGridButtonsVisible (false);
                 collectButton.setVisible (true);
                 sendToDropDown.setVisible(true);
 
 
+                /*
                 ArrayList<Account> allCheckingSavingAccts  = new ArrayList<>();
                 allCheckingSavingAccts.addAll(loggedCust.getAccountOfType(0));
                 allCheckingSavingAccts.addAll(loggedCust.getAccountOfType(1));
@@ -883,19 +843,19 @@ public class ATMInterface extends JFrame {
                     }
                 }
                 sendToDropDown.setModel(new DefaultComboBoxModel(allAcctIDs.toArray()));
-
-                 ArrayList<Integer> pocketAcctIDs  = new ArrayList<>();
-                 ArrayList<Account> pocketAccts = loggedCust.getAccountOfType(3);
-                 for(int i =0; i<pocketAccts.size(); i++)
-                 {
-                    //System.out.println("we in2: "+pocketAccts.get(i).getAccountID());
+                */
+                ArrayList<Integer> pocketAcctIDs  = new ArrayList<>();
+                ArrayList<Account> pocketAccts = loggedCust.getAccountOfType(3);
+                for(int i = 0; i<pocketAccts.size(); i++)
+                {
+                //System.out.println("we in2: "+pocketAccts.get(i).getAccountID());
                     if(pocketAccts.get(i).getDeleteDate()==null)
                     {
-                         pocketAcctIDs.add(pocketAccts.get(i).getAccountID());
+                        pocketAcctIDs.add(pocketAccts.get(i).getAccountID());
                     }
-                 }
+                }
                  
-                 comboBox3.setModel(new DefaultComboBoxModel(pocketAcctIDs.toArray()));
+                comboBox2.setModel(new DefaultComboBoxModel(pocketAcctIDs.toArray()));
 
 
 

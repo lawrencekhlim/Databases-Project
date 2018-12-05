@@ -87,6 +87,15 @@ public class Account {
         if (callCreateAccount)
             createAccount();
     }
+    
+    public Account (int accountID, int actT, double m, java.sql.Date dDate, double aRate, int primOwner, boolean callCreateAccount) {
+        this.accountID = accountID;
+        this.accountType = actT;
+        this.money = m;
+        this.deleteDate = dDate;
+        this.annualRate = aRate;
+        this.primaryOwner = primOwner;
+    }
 
     public boolean createAccount (java.sql.Date current) {
         generateAccountID();

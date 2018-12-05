@@ -95,12 +95,13 @@ public class Customer {
     }
     
     
-    public void createCustomer () {
+    public boolean createCustomer () {
         //createID();
         String query = "INSERT INTO Customer (TID, name, address, PIN) VALUES (?, ?, ?, ?)";
         DatabaseHelper.getInstance().openConnection();
         PreparedStatement stmt = DatabaseHelper.getInstance ().createAction (query);
         
+        boolean success = true;
         try {
             stmt.setInt (1, TID);
             stmt.setString (2, name);
@@ -109,10 +110,12 @@ public class Customer {
             stmt.execute();
         } catch (SQLException e) {
             System.err.println ("Execution failed");
+            success = false;
             e.printStackTrace();
         }
 
         DatabaseHelper.getInstance().closeConnection();
+        return success;
         
     }
 

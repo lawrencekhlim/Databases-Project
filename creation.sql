@@ -1,7 +1,7 @@
-CREATE TABLE Customer ( TID			INTEGER,
+PCREATE TABLE Customer ( TID			INTEGER,
 				    	name		CHAR(30),
 				    	address		CHAR(40),
-				   	    PIN			CHAR(4) NOT NULL,
+				   	    PIN			CHAR(4) NOT NULL UNIQUE,
 				    	PRIMARY KEY (TID));
 
 CREATE TABLE Account (  account_id          INTEGER,
@@ -30,7 +30,7 @@ CREATE TABLE Transaction ( transaction_id 	INTEGER,
 						   FOREIGN KEY(decrAcctID) REFERENCES Account(account_id) ON DELETE SET NULL);
 
 CREATE TABLE PocketAccount (account_id      INTEGER,
-                            linked_account  INTEGER,
+                            linked_account  INTEGER NOT NULL,
                             recent_fee      DATE,
                             PRIMARY KEY (account_id),
                             FOREIGN KEY (account_id) REFERENCES Account (account_id),

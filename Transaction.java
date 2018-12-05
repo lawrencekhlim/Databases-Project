@@ -200,11 +200,10 @@ public class Transaction {
             decrAccount = new Account (decrAcctID);
             Date recfee = decrAccount.getRecentFee ();
             long day30 = 31l * 24 * 60 * 60 * 1000;
-            if (!recfee.after(new Date(current.getTime() - day30))) {
+            if (recfee != null && !recfee.after(new Date(current.getTime() - day30))) {
                 return createTransaction ();
             }
-            else if((recfee.after(new Date(current.getTime() - day30)) && decrAccount.getMoney() >= moneyTrans + 5)) {
-                System.out.println("NEGATIVE BALANCE or closed account");
+            else if(((recfee == null || recfee.after(new Date(current.getTime() - day30))) && decrAccount.getMoney() >= moneyTrans + 5)) {
                 if (createTransaction()) {
                     Transaction fee = new Transaction (current, 5, 10, -1, decrAcctID);
                     
