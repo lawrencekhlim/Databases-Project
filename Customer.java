@@ -302,6 +302,12 @@ public class Customer {
 
         Customer ctest = new Customer(2);
         System.out.println(ctest.getAccounts());
+        int[] str = {1234,1468,3764,8582,3856,8193,9824,3532,8471,3692,4659,9173,7351,5340,8452,1821};
+
+       for(int i = 0;i<str.length; i++)
+        {
+            System.out.println(Integer.toString(str[i]) +" "+encode(Integer.toString(str[i])));
+        }
     }
     
 }
