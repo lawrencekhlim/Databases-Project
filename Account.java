@@ -75,6 +75,7 @@ public class Account {
 		this.deleteDate = dDate;
 		this.annualRate = aRate;
 		this.primaryOwner = primOwner;
+        generateAccountID();
 		createAccount();
 	}
     
@@ -84,6 +85,7 @@ public class Account {
         this.deleteDate = dDate;
         this.annualRate = aRate;
         this.primaryOwner = primOwner;
+        generateAccountID();
         if (callCreateAccount)
             createAccount();
     }
@@ -95,10 +97,11 @@ public class Account {
         this.deleteDate = dDate;
         this.annualRate = aRate;
         this.primaryOwner = primOwner;
+        if (callCreateAccount)
+            createAccount();
     }
 
     public boolean createAccount (java.sql.Date current) {
-        generateAccountID();
         boolean success = true;
         String query = "INSERT INTO Account (account_id, deletedDate, account_type, moneyVal, primOwner, annualRate) VALUES (?, ?, ?, ?, ?, ?)";
         System.out.println (query);
@@ -121,12 +124,14 @@ public class Account {
             }
             stmt.setInt (5, primaryOwner);
             stmt.setDouble(6, annualRate);
+            //System.out.println ("Here");
             stmt.execute();
         } catch (SQLException e) {
             System.err.println ("Execution failed");
             success = false;
             e.printStackTrace();
         }
+        //System.out.println ("Here2");
         //System.out.println ("After execution");
         DatabaseHelper.getInstance().closeConnection();
         
@@ -260,7 +265,7 @@ public class Account {
                 if (stmt.wasNull())
                     address = "";
                 
-                ret.add (new Customer (stmt.getInt ("TID"), name, address, stmt.getInt ("PIN") ));
+                ret.add (new Customer (stmt.getInt ("TID"), name, address, stmt.getString ("PIN") ));
             }
         } catch (Exception e) {
             

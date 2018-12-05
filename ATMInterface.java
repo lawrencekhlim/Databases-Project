@@ -75,24 +75,30 @@ public class ATMInterface extends JFrame {
                 //System.out.println("here");
                 //gridButtons.setVisible(true);
                 // ((CardLayout)userInterface.getLayout()).show (userInterface, "idleState");
-                String pinID =  userInput.getText();
+                String pinID = Customer.encode(userInput.getText());
                 System.out.println(pinID);
+                /*
                 ArrayList<String> allPins = new ArrayList<>();
                 allPins = Customer.getAllPins();
 
                 for(int i =0; i<allPins.size(); i++) {
                     if(allPins.get(i).equals(pinID)) {
-                        System.out.println("We have a mach!");
+                        System.out.println("We have a match!");
                         loggedCust = new Customer(pinID);
                         System.out.print(loggedCust.getName());
                         gridButtons.setVisible(true);
                         idleView();
                     }
                 }
+                 */
+                loggedCust = new Customer(pinID);
 
-                if(loggedCust==null)
-                {
+                if(loggedCust.getID() == -1) {
                     JOptionPane.showMessageDialog(null, "ERROR! Pin is not linked to an account.");
+                }
+                else {
+                    gridButtons.setVisible(true);
+                    idleView();
                 }
             }
         });

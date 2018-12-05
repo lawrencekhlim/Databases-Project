@@ -237,7 +237,7 @@ public class BankTellerInterface extends JFrame {
                 // TODO Create Account
                 boolean success = true;
                 try {
-                    Customer c = new Customer (Integer.parseInt (enterCustomerTextField2.getText()), enterCustomerNameTextField7.getText(), enterAddressTextField7.getText(),Integer.parseInt(enterPINTextField7.getText()));
+                    Customer c = new Customer (Integer.parseInt (enterCustomerTextField2.getText()), enterCustomerNameTextField7.getText(), enterAddressTextField7.getText(), Customer.encode(enterPINTextField7.getText()));
                     success = c.createCustomer();
                 } catch (Exception e) {
                     success = false;
@@ -390,7 +390,7 @@ public class BankTellerInterface extends JFrame {
                     }
                     boolean createdAccount = true;
                     try {
-                        a = new Account (acctType, money, null, interest_rate, Integer.parseInt (enterCustomerTextField2.getText()), false);
+                        a = new Account (Integer.parseInt (enterAcctNumberTextField8.getText()), acctType, money, null, interest_rate, Integer.parseInt (enterCustomerTextField2.getText()), false);
                         createdAccount = a.createAccount (current);
                     } catch (Exception e) {
                         createdAccount = false;

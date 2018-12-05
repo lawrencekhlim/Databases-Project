@@ -5,14 +5,14 @@ public class Customer {
     private int TID;
     private String name;
     private String address;
-    private int PIN;
+    private String PIN;
     private ArrayList <Account> accounts;
     
     public Customer(){
-        TID = 0;
+        TID = -1;
         name = "";
         address = "";
-        PIN = 0;
+        PIN = "----";
     }
     
     public Customer(int TID){
@@ -25,24 +25,24 @@ public class Customer {
             if (rs.next()) {
                 name = rs.getString("name");
                 address = rs.getString("address");
-                PIN = Integer.parseInt(rs.getString("PIN"));
+                PIN = (rs.getString("PIN"));
             }
             else {
                 name = "";
                 address = "";
-                PIN = -1;
+                PIN = "----";
                 this.TID = -1;
             }
         } catch (SQLException e) {
             name = "";
             address = "";
-            PIN = -1;
+            PIN = "----";
             TID = -1;
         }
         DatabaseHelper.getInstance().closeConnection();
     }
     
-    public Customer(String name, String address, int PIN){
+    public Customer(String name, String address, String PIN){
         this.name = name;
         this.address = address;
         this.PIN = PIN;
@@ -53,8 +53,9 @@ public class Customer {
     public Customer(String pin)
     {
         DatabaseHelper.getInstance().openConnection();
-        String query = "SELECT * FROM Customer C WHERE C.PIN="+pin;
-        PIN = Integer.parseInt(pin);
+        //PIN = Customer.encode(pin);
+        PIN = pin;
+        String query = "SELECT * FROM Customer C WHERE C.PIN='"+PIN+"'";
         ResultSet rs = DatabaseHelper.getInstance().executeQuery(query);
         try {
             if (rs.next()) {
@@ -62,17 +63,23 @@ public class Customer {
                 address = rs.getString("address");
                 TID = rs.getInt("TID");
             }
+            else {
+                name = "";
+                address = "";
+                PIN = "----";
+                TID = -1;
+            }
         } catch (SQLException e) {
             name = "";
             address = "";
-            PIN = -1;
+            PIN = "----";
             TID = -1;
         }
         DatabaseHelper.getInstance().closeConnection();
 
     }
     
-    public Customer(int TID, String name, String address, int PIN){
+    public Customer(int TID, String name, String address, String PIN){
         this.TID = TID;
         this.name = name;
         this.address = address;
@@ -92,6 +99,14 @@ public class Customer {
             TID = 0;
         }
         System.out.println (TID);
+    }
+    
+    public static String encode (String PIN) {
+        String encrypted = "";
+        for (int i = 0; i < PIN.length(); i++) {
+            encrypted += (char) ((int)PIN.charAt (i) *2);
+        }
+        return encrypted;
     }
     
     
@@ -131,7 +146,7 @@ public class Customer {
             while (rs.next()) {
                 String pin = rs.getString("PIN");
                 pins.add (pin);
-                System.out.println("pin "+pin);
+                //System.out.println("pin "+pin);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -243,22 +258,22 @@ public class Customer {
         return address;
     }
     
-    public int getPIN () {
+    public String getPIN () {
         return PIN;
     }
     
-    public boolean verifyPIN (int PINnumber) {
-        return PINnumber == PIN;
+    public boolean verifyPIN (String PINnumber) {
+        return PINnumber.equals(PIN);
     }
     
-    public boolean setPIN (int prevPIN, int newPIN) {
+    public boolean setPIN (String prevPIN, String newPIN) {
         if (verifyPIN (prevPIN)) {
             // Update
             DatabaseHelper.getInstance().openConnection();
             String updateQuery = "UPDATE Customer SET PIN=? WHERE TID=?";
             PreparedStatement stmt = DatabaseHelper.getInstance ().createAction (updateQuery);
             try {
-                stmt.setInt(1, newPIN);
+                stmt.setString(1, newPIN);
                 stmt.setInt(2, TID);
                 stmt.execute();
             } catch (Exception e) {
